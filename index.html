@@ -4,10 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Raffu — Art Portfolio & Commissions</title>
-
 <link rel="icon" type="image/png" href="favicon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
 <style>
   :root{
     --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ring:rgba(255,106,0,.28);
@@ -15,12 +13,7 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0;
-    background:linear-gradient(180deg,#0b0b0f 0%, #0b0b0f 40%, #0f0f15 100%);
-    color:var(--ink);
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial
-  }
+  body{margin:0; background:linear-gradient(180deg,#0b0b0f 0%, #0b0b0f 40%, #0f0f15 100%); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   a{color:inherit; text-decoration:none}
   img{max-width:100%; display:block}
   .wrap{max-width:1100px; margin:0 auto; padding:24px}
@@ -34,25 +27,15 @@
   .brand{display:flex; align-items:center; gap:10px}
   .brand h1{font-size:18px; margin:0}
 
-  /* Transparent signature logo (no square) + pulsing orange glow */
+  /* Logo (transparent, no square) + pulsing glow */
   .logo{
-    width:36px; height:36px; object-fit:contain; background:none; border-radius:0;
-    filter:
-      drop-shadow(0 0 2px rgba(255,106,0,.55))
-      drop-shadow(0 0 0 rgba(255,106,0,0));
-    animation: logo-glow 2.6s ease-in-out infinite;
+    width:36px; height:36px; object-fit:contain;
+    filter:drop-shadow(0 0 2px rgba(255,106,0,.55)) drop-shadow(0 0 0 rgba(255,106,0,0));
+    animation:logo-glow 2.6s ease-in-out infinite;
   }
   @keyframes logo-glow{
-    0%,100%{
-      filter:
-        drop-shadow(0 0 2px rgba(255,106,0,.45))
-        drop-shadow(0 0 0 rgba(255,106,0,0));
-    }
-    50%{
-      filter:
-        drop-shadow(0 0 8px rgba(255,106,0,.9))
-        drop-shadow(0 0 18px rgba(255,106,0,.55));
-    }
+    0%,100%{filter:drop-shadow(0 0 2px rgba(255,106,0,.45)) drop-shadow(0 0 0 rgba(255,106,0,0))}
+    50%{filter:drop-shadow(0 0 8px rgba(255,106,0,.9)) drop-shadow(0 0 18px rgba(255,106,0,.55))}
   }
 
   .menu{display:flex; gap:14px; flex-wrap:wrap}
@@ -60,14 +43,17 @@
   .menu a:hover{color:var(--ink); border-color:rgba(255,255,255,.08); background:rgba(255,255,255,.03)}
   .cta{background:var(--accent); color:#0b0b0f; padding:10px 14px; border-radius:12px; font-weight:800; box-shadow:0 6px 16px -6px var(--accent)}
 
-  /* Layout + cards */
+  /* Mobile hamburger */
+  .hamburger{display:none; background:transparent; border:1px solid rgba(255,255,255,.12); color:#fff; padding:8px 10px; border-radius:10px}
+  .hamburger:focus{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* Cards & layout */
   .hero{display:grid; grid-template-columns:1.4fr 1fr; gap:26px; padding:26px 0 10px}
   .card{background:linear-gradient(180deg,#131318,#101016); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:0 10px 40px -24px #000; overflow:hidden}
   .p16{padding:16px} .p24{padding:24px}
   .title{font-size:34px; line-height:1.1; margin:6px 0 10px}
   .accent{color:var(--accent)}
   .tagline{color:var(--muted)}
-  .hero .p16{ margin-top:-12px; }
 
   section{scroll-margin-top:84px; margin-top:24px}
   .section-head{display:flex; align-items:end; justify-content:space-between; margin-bottom:12px}
@@ -78,27 +64,16 @@
   /* Commission slots */
   .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
   .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-  .slot{
-    border-radius:12px; padding:12px 10px; text-align:center; font-weight:800;
-    border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  }
-  .slot.free{ color:#0b0b0f; background:#ff6a00; } /* orange = FREE */
-  .slot.taken{ color:#eaeaf1; background:#0b0b0f; }
-  .slot:hover{ transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6) }
-  @media (max-width:640px){ .slot-grid{grid-template-columns:repeat(2,1fr)} }
+  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
+  .slot.free{color:#0b0b0f; background:#ff6a00}
+  .slot.taken{color:#eaeaf1; background:#0b0b0f}
+  .slot:hover{transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
 
   /* Gallery */
   .grid{display:grid; gap:14px}
-  .insta-grid{grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); background:transparent; padding:0;}
-  .img-card{
-    border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in;
-    background:transparent; border:1px solid rgba(255,255,255,.06);
-    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-  }
-  .img-card img{
-    width:100%; height:100%; object-fit:cover; aspect-ratio:4/5;
-    background:var(--bg); transition:transform .35s ease; display:block;
-  }
+  .insta-grid{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
+  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+  .img-card img{width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; background:var(--bg); transition:transform .35s ease; display:block}
   .img-card:hover{transform:scale(1.035); box-shadow:0 18px 50px -18px rgba(0,0,0,.6), 0 0 0 6px var(--ring); border-color:rgba(255,255,255,.12)}
   .img-card:hover img{transform:scale(1.03)}
 
@@ -124,23 +99,51 @@
   .ctrl{border:none; padding:10px 12px; border-radius:10px; color:#fff; background:#2a2b32; cursor:pointer}
   .ctrl:hover{background:#343541}
   .lb-close{position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none; border-radius:10px; padding:10px 12px; cursor:pointer}
+
+  /* --------- MOBILE BREAKPOINTS --------- */
+  @media (max-width: 960px){
+    .wrap{padding:18px}
+    .hero{grid-template-columns:1fr; gap:16px}
+    .title{font-size:clamp(22px,6.2vw,32px)}
+    .section-head h2{font-size:clamp(18px,4.4vw,22px)}
+  }
+  @media (max-width: 720px){
+    .hamburger{display:block}
+    /* collapse menu under header */
+    header .menu{
+      display:none; position:absolute; left:0; right:0; top:100%;
+      background:rgba(11,11,15,.98); border-bottom:1px solid rgba(255,255,255,.06);
+      padding:10px; gap:8px; flex-direction:column;
+    }
+    header.open .menu{display:flex}
+    .menu a{padding:12px; border-radius:10px}
+    .slot-grid{grid-template-columns:repeat(2,1fr)}
+    .btn, .btn.primary{width:100%; text-align:center}
+    .logo{width:30px; height:30px}
+    .lb-controls{bottom:16px}
+    .ctrl{padding:12px 14px}
+  }
+  @media (max-width: 420px){
+    .slot-grid{grid-template-columns:1fr}
+    .logo{width:28px; height:28px}
+  }
 </style>
 </head>
 <body>
 
-<header>
+<header id="siteHeader">
   <div class="wrap nav">
     <div class="brand">
-      <!-- Transparent PNG from Imgur (no square) -->
       <img class="logo" src="https://i.imgur.com/q1n55tZ.png" alt="Raffu Logo">
       <h1 id="artistName">Raffu</h1>
     </div>
-    <nav class="menu">
+    <nav class="menu" id="menu">
       <a href="#home">Home</a>
       <a href="#gallery">Gallery</a>
       <a href="#commissions">Commissions</a>
       <a href="#contact" class="cta">Contact</a>
     </nav>
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
   </div>
 </header>
 
@@ -225,7 +228,7 @@
 <div id="toast" style="position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111218; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); display:none">Copied!</div>
 
 <script>
-/* ================== CONFIG ================== */
+/* ============== CONFIG ============== */
 const CONFIG = {
   artistName: "Raffu's Drawing Wall",
   discordTag: "Raffu_",
@@ -264,7 +267,7 @@ const CONFIG = {
     ]}
   ]
 };
-/* ============================================ */
+/* ==================================== */
 
 /* Branding & basics */
 document.title = `${CONFIG.artistName} — Art Portfolio & Commissions`;
@@ -334,7 +337,7 @@ const grid = document.getElementById('instaGrid');
 CONFIG.galleryImages.forEach(src=>{
   const card = document.createElement('div');
   card.className = 'img-card reveal';
-  card.innerHTML = `<img alt="Artwork" src="${src}">`;
+  card.innerHTML = `<img alt="Artwork" src="${src}" loading="lazy" decoding="async">`;
   card.addEventListener('click', ()=> openLightbox(src));
   grid.appendChild(card);
 });
@@ -406,6 +409,14 @@ window.addEventListener('mousemove', (e)=>{
 });
 lbStage.addEventListener('dblclick', (e)=>{
   if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
+});
+
+/* Mobile nav toggle */
+const headerEl = document.getElementById('siteHeader');
+const ham = document.getElementById('hamburger');
+ham.addEventListener('click', ()=>{
+  headerEl.classList.toggle('open');
+  ham.setAttribute('aria-expanded', headerEl.classList.contains('open'));
 });
 </script>
 </body>
