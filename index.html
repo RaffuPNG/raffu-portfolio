@@ -4,7 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Raffu — Art Portfolio & Commissions</title>
-<link rel="icon" type="image/png" href="favicon.png" />
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.imgur.com/uD9c0sI.png" />
+<link rel="apple-touch-icon" href="https://i.imgur.com/uD9c0sI.png" />
+<link rel="shortcut icon" href="https://i.imgur.com/uD9c0sI.png" />
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -64,7 +69,11 @@
   /* Commission slots */
   .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
   .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
+  .slot{
+    border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08);
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    cursor:pointer; /* clickable */
+  }
   .slot.free{color:#0b0b0f; background:#ff6a00}
   .slot.taken{color:#eaeaf1; background:#0b0b0f}
   .slot:hover{transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
@@ -99,6 +108,24 @@
   .ctrl{border:none; padding:10px 12px; border-radius:10px; color:#fff; background:#2a2b32; cursor:pointer}
   .ctrl:hover{background:#343541}
   .lb-close{position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none; border-radius:10px; padding:10px 12px; cursor:pointer}
+
+  /* Popup (slot message) */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; z-index:110}
+  .overlay.open{display:block}
+  .popup{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:linear-gradient(180deg,#141419,#0f0f14);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:18px; width:min(92vw,420px);
+    display:none; z-index:120; text-align:center; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
+  }
+  .popup.open{display:block}
+  .popup h3{margin:0 0 6px}
+  .popup p{margin:0 0 14px; color:var(--muted)}
+  .popup .pop-actions{display:flex; justify-content:center; gap:10px}
+  .pop-btn{border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700}
+  .pop-ok{background:var(--accent); color:#0b0b0f}
+  .pop-cancel{background:#2a2b32; color:#fff}
 
   /* --------- MOBILE BREAKPOINTS --------- */
   @media (max-width: 960px){
@@ -225,6 +252,16 @@
   </div>
 </div>
 
+<!-- SLOT POPUP -->
+<div id="slotOverlay" class="overlay" role="presentation"></div>
+<div id="slotPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="slotPopupTitle">
+  <h3 id="slotPopupTitle">Slot status</h3>
+  <p id="slotPopupMsg"></p>
+  <div class="pop-actions">
+    <button class="pop-btn pop-ok" id="slotOk">OK</button>
+  </div>
+</div>
+
 <div id="toast" style="position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111218; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); display:none">Copied!</div>
 
 <script>
@@ -287,7 +324,7 @@ document.getElementById('copyDiscord').onclick = async ()=>{
   catch{ toast(CONFIG.discordTag); }
 };
 
-/* Commission slots */
+/* Commission slots + click popup */
 function buildSlots(){
   const grid = document.getElementById('slotGrid');
   const sum = document.getElementById('slotSummary');
@@ -307,6 +344,13 @@ function buildSlots(){
     div.style.background = s.free ? freeColor : takenColor;
     div.style.borderColor = s.free ? 'transparent' : 'rgba(255,255,255,.12)';
     if(s.free) freeCount++;
+
+    // Click -> popup with status
+    div.addEventListener('click', ()=>{
+      if (s.free) openPopup('✅ This slot is free to take!');
+      else openPopup('❌ This slot is currently unavailable');
+    });
+
     grid.appendChild(div);
   });
   sum.textContent = `${freeCount}/${cfg.maxSlots} free`;
@@ -411,6 +455,25 @@ lbStage.addEventListener('dblclick', (e)=>{
   if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
 });
 
+/* Slot popup helpers */
+const slotOverlay = document.getElementById('slotOverlay');
+const slotPopup = document.getElementById('slotPopup');
+const slotMsg = document.getElementById('slotPopupMsg');
+const slotOk = document.getElementById('slotOk');
+
+function openPopup(message){
+  slotMsg.textContent = message;
+  slotOverlay.classList.add('open');
+  slotPopup.classList.add('open');
+}
+function closePopup(){
+  slotOverlay.classList.remove('open');
+  slotPopup.classList.remove('open');
+}
+slotOverlay.addEventListener('click', closePopup);
+slotOk.addEventListener('click', closePopup);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePopup(); });
+
 /* Mobile nav toggle */
 const headerEl = document.getElementById('siteHeader');
 const ham = document.getElementById('hamburger');
@@ -421,4 +484,3 @@ ham.addEventListener('click', ()=>{
 </script>
 </body>
 </html>
-
