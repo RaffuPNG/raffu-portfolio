@@ -31,18 +31,7 @@
   .nav{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0}
   .brand{display:flex; align-items:center; gap:10px}
   .brand h1{font-size:18px; margin:0}
-
-  /* Logo (transparent, no square) + pulsing glow */
-  .logo{
-    width:36px; height:36px; object-fit:contain;
-    filter:drop-shadow(0 0 2px rgba(255,106,0,.55)) drop-shadow(0 0 0 rgba(255,106,0,0));
-    animation:logo-glow 2.6s ease-in-out infinite;
-  }
-  @keyframes logo-glow{
-    0%,100%{filter:drop-shadow(0 0 2px rgba(255,106,0,.45)) drop-shadow(0 0 0 rgba(255,106,0,0))}
-    50%{filter:drop-shadow(0 0 8px rgba(255,106,0,.9)) drop-shadow(0 0 18px rgba(255,106,0,.55))}
-  }
-
+  .logo{width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 0 2px rgba(255,106,0,.55))}
   .menu{display:flex; gap:14px; flex-wrap:wrap}
   .menu a{padding:8px 12px; border-radius:12px; color:var(--muted); transition:all .25s ease; border:1px solid transparent}
   .menu a:hover{color:var(--ink); border-color:rgba(255,255,255,.08); background:rgba(255,255,255,.03)}
@@ -50,7 +39,6 @@
 
   /* Mobile hamburger */
   .hamburger{display:none; background:transparent; border:1px solid rgba(255,255,255,.12); color:#fff; padding:8px 10px; border-radius:10px}
-  .hamburger:focus{outline:2px solid var(--accent); outline-offset:2px}
 
   /* Cards & layout */
   .hero{display:grid; grid-template-columns:1.4fr 1fr; gap:26px; padding:26px 0 10px}
@@ -69,11 +57,7 @@
   /* Commission slots */
   .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
   .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-  .slot{
-    border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08);
-    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, opacity .25s ease;
-    cursor:pointer;
-  }
+  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; cursor:pointer}
   .slot.free{color:#0b0b0f; background:#ff6a00}
   .slot.taken{color:#eaeaf1; background:#0b0b0f}
   .slot:hover{transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
@@ -81,82 +65,50 @@
   /* Gallery */
   .grid{display:grid; gap:14px}
   .insta-grid{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
-  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06);
-    transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease, opacity .35s ease}
-  .img-card img{width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; background:var(--bg); transition:transform .45s ease}
+  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+  .img-card img{width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; background:var(--bg); transition:transform .35s ease; display:block}
   .img-card:hover{transform:scale(1.035); box-shadow:0 18px 50px -18px rgba(0,0,0,.6), 0 0 0 6px var(--ring); border-color:rgba(255,255,255,.12)}
-  .img-card:hover img{transform:scale(1.05)}
+  .img-card:hover img{transform:scale(1.03)}
 
   /* Prices */
   .prices{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
   .price-card{padding:18px; border-radius:16px; background:linear-gradient(180deg,#141419,#0f0f14); border:1px solid rgba(255,255,255,.06)}
   .price{font-size:18px; font-weight:800; color:var(--accent)}
-  .btn{display:inline-block; margin-top:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); transition:transform .2s ease, opacity .2s ease}
+  .btn{display:inline-block; margin-top:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); transition:opacity .2s ease}
   .btn.primary{background:var(--accent); color:#0b0b0f; border-color:transparent; font-weight:800}
-  .btn:hover{transform:translateY(-1px)}
 
   footer{color:var(--muted); font-size:13px; text-align:center; padding:22px 0 40px}
 
   /* Reveal on scroll */
-  .reveal{opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s ease}
+  .reveal{opacity:0; transform:translateY(12px); transition:all .5s ease}
   .reveal.visible{opacity:1; transform:none}
 
-  /* ---------- Smooth Lightbox ---------- */
-  .lightbox{
-    position:fixed; inset:0; background:rgba(0,0,0,.8);
-    display:flex; align-items:center; justify-content:center; z-index:100;
-    opacity:0; pointer-events:none; transition:opacity .35s ease;
-  }
-  .lightbox.open{opacity:1; pointer-events:auto}
-  .lb-stage{
-    position:relative; max-width:90vw; max-height:90vh; overflow:hidden;
-    border-radius:16px; background:#0a0a0d; border:1px solid rgba(255,255,255,.08);
-    display:flex; align-items:center; justify-content:center;
-    transform:scale(.96); transition:transform .35s ease;
-  }
-  .lightbox.open .lb-stage{transform:scale(1)}
-  .lb-img{
-    max-width:90vw; max-height:90vh; width:auto; height:auto;
-    transform-origin:center center; will-change:transform;
-    cursor:grab; user-select:none; -webkit-user-drag:none;
-  }
-  .lb-controls{
-    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-    display:flex; gap:8px; background:rgba(20,20,26,.75); backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.1); padding:8px; border-radius:12px;
-    opacity:0; transition:opacity .35s ease;
-  }
-  .lightbox.open .lb-controls{opacity:1}
+  /* Lightbox */
+  .lightbox{position:fixed; inset:0; background:rgba(0,0,0,.8); display:none; align-items:center; justify-content:center; z-index:100}
+  .lightbox.open{display:flex}
+  .lb-stage{position:relative; max-width:90vw; max-height:90vh; overflow:hidden; border-radius:16px; background:#0a0a0d; border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center}
+  .lb-img{max-width:90vw; max-height:90vh; width:auto; height:auto; transform-origin:center center; will-change:transform; cursor:grab; user-select:none; -webkit-user-drag:none}
+  .lb-controls{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:rgba(20,20,26,.75); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); padding:8px; border-radius:12px}
   .ctrl{border:none; padding:10px 12px; border-radius:10px; color:#fff; background:#2a2b32; cursor:pointer}
   .ctrl:hover{background:#343541}
-  .lb-close{
-    position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none;
-    border-radius:10px; padding:10px 12px; cursor:pointer; opacity:0; transition:opacity .35s ease
-  }
-  .lightbox.open .lb-close{opacity:1}
+  .lb-close{position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none; border-radius:10px; padding:10px 12px; cursor:pointer}
 
-  /* ---------- Smooth Slot Popup ---------- */
-  .overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:110;
-    opacity:0; pointer-events:none; transition:opacity .3s ease;
-  }
-  .overlay.open{opacity:1; pointer-events:auto}
-
+  /* Popup (slot message) */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; z-index:110}
+  .overlay.open{display:block}
   .popup{
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(.92);
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     background:linear-gradient(180deg,#141419,#0f0f14);
     border:1px solid rgba(255,255,255,.1);
     border-radius:14px; padding:18px; width:min(92vw,420px);
-    z-index:120; text-align:center; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
-    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    display:none; z-index:120; text-align:center; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
   }
-  .popup.open{opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto}
+  .popup.open{display:block}
   .popup h3{margin:0 0 6px}
   .popup p{margin:0 0 14px; color:var(--muted)}
   .popup .pop-actions{display:flex; justify-content:center; gap:10px}
   .pop-btn{border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700}
   .pop-ok{background:var(--accent); color:#0b0b0f}
-  .pop-cancel{background:#2a2b32; color:#fff}
 
   /* --------- MOBILE BREAKPOINTS --------- */
   @media (max-width: 960px){
@@ -167,7 +119,6 @@
   }
   @media (max-width: 720px){
     .hamburger{display:block}
-    /* collapse menu under header */
     header .menu{
       display:none; position:absolute; left:0; right:0; top:100%;
       background:rgba(11,11,15,.98); border-bottom:1px solid rgba(255,255,255,.06);
@@ -304,12 +255,6 @@ const CONFIG = {
   instagramProfile: "https://www.instagram.com/raffu.draws/",
   commissions: {
     maxSlots: 4,
-    slots: [
-      { name: "Slot 1", free: true },
-      { name: "Slot 2", free: true },
-      { name: "Slot 3", free: true },
-      { name: "Slot 4", free: true },
-    ],
     freeColor: "#ff6a00",
     takenColor: "#0b0b0f"
   },
@@ -355,40 +300,63 @@ document.getElementById('copyDiscord').onclick = async ()=>{
   catch{ toast(CONFIG.discordTag); }
 };
 
-/* Commission slots + click popup */
-function buildSlots(){
+/* =================== SLOTS (Netlify) =================== */
+const SLOT_API = '/.netlify/functions/slots';
+
+async function getSlots() {
+  const r = await fetch(SLOT_API, { method: 'GET', cache: 'no-store' });
+  const data = await r.json();
+  return data.slots || [true, true, true, true];
+}
+
+async function buildSlots() {
   const grid = document.getElementById('slotGrid');
   const sum = document.getElementById('slotSummary');
-  grid.innerHTML = "";
-  const cfg = CONFIG.commissions;
-  const freeColor = cfg.freeColor || getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  const takenColor = cfg.takenColor || '#0b0b0f';
+  grid.innerHTML = '';
 
-  const slots = (cfg.slots || []).slice(0, cfg.maxSlots);
-  while (slots.length < cfg.maxSlots){ slots.push({ name:`Slot ${slots.length+1}`, free:true }); }
+  let slots;
+  try {
+    slots = await getSlots();
+  } catch (e) {
+    // if the function fails, show all taken (safe fallback)
+    slots = [false, false, false, false];
+  }
 
   let freeCount = 0;
-  slots.forEach(s=>{
-    const div = document.createElement('div');
-    div.className = 'slot ' + (s.free ? 'free' : 'taken');
-    div.textContent = s.name;
-    div.style.background = s.free ? freeColor : takenColor;
-    div.style.borderColor = s.free ? 'transparent' : 'rgba(255,255,255,.12)';
-    if(s.free) freeCount++;
 
-    // Click -> popup with status (smooth)
-    div.addEventListener('click', ()=>{
-      if (s.free) openPopup('✅ This slot is free to take!');
+  slots.forEach((isFree, i) => {
+    const div = document.createElement('div');
+    div.className = 'slot ' + (isFree ? 'free' : 'taken');
+    div.textContent = `Slot ${i + 1}`;
+    div.style.background = isFree ? (CONFIG.commissions.freeColor || '#ff6a00')
+                                  : (CONFIG.commissions.takenColor || '#0b0b0f');
+    div.style.borderColor = isFree ? 'transparent' : 'rgba(255,255,255,.12)';
+    if (isFree) freeCount++;
+
+    div.addEventListener('click', () => {
+      if (isFree) openPopup('✅ This slot is free to take!');
       else openPopup('❌ This slot is currently unavailable');
     });
 
     grid.appendChild(div);
   });
-  sum.textContent = `${freeCount}/${cfg.maxSlots} free`;
-}
-buildSlots();
 
-/* Prices (REQUEST -> Instagram) */
+  sum.textContent = `${freeCount}/${slots.length} free`;
+
+  // Disable "Request" buttons if no free slots
+  const anyFree = freeCount > 0;
+  document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn => {
+    if (!btn.dataset.baseText) btn.dataset.baseText = btn.textContent;
+    btn.disabled = !anyFree;
+    btn.style.opacity = anyFree ? '1' : '.55';
+    btn.style.pointerEvents = anyFree ? 'auto' : 'none';
+    btn.textContent = anyFree ? btn.dataset.baseText : 'No slots available';
+    btn.setAttribute('aria-disabled', String(!anyFree));
+  });
+}
+/* ======================================================= */
+
+/* Prices (REQUEST -> Instagram for now) */
 const pricesGrid = document.getElementById('pricesGrid');
 CONFIG.prices.forEach(group=>{
   const card = document.createElement('div');
@@ -429,7 +397,7 @@ function toast(msg){
   setTimeout(()=> t.style.display='none', 1100);
 }
 
-/* -------- Lightbox with smooth fade/scale + zoom -------- */
+/* Lightbox with fit + zoom */
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lbImg');
 const lbStage = document.getElementById('lbStage');
@@ -444,7 +412,7 @@ const MIN_SCALE = 1, MAX_SCALE = 2.5;
 function openLightbox(src){
   lbImg.onload = ()=>{ resetZoom(); };
   lbImg.src = src;
-  lb.classList.add('open'); // CSS handles smooth fade/scale
+  lb.classList.add('open');
   document.body.style.overflow='hidden';
 }
 function closeLightbox(){ lb.classList.remove('open'); document.body.style.overflow=''; }
@@ -486,7 +454,7 @@ lbStage.addEventListener('dblclick', (e)=>{
   if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
 });
 
-/* -------- Slot popup with smooth fade/scale -------- */
+/* Popup helpers */
 const slotOverlay = document.getElementById('slotOverlay');
 const slotPopup = document.getElementById('slotPopup');
 const slotMsg = document.getElementById('slotPopupMsg');
@@ -503,7 +471,6 @@ function closePopup(){
 }
 slotOverlay.addEventListener('click', closePopup);
 slotOk.addEventListener('click', closePopup);
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePopup(); });
 
 /* Mobile nav toggle */
 const headerEl = document.getElementById('siteHeader');
@@ -512,6 +479,9 @@ ham.addEventListener('click', ()=>{
   headerEl.classList.toggle('open');
   ham.setAttribute('aria-expanded', headerEl.classList.contains('open'));
 });
+
+/* Kick things off */
+buildSlots(); // <-- important: fetches real slot state and paints UI
 </script>
 </body>
 </html>
