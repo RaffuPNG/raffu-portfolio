@@ -11,6 +11,10 @@
 <link rel="shortcut icon" href="https://i.imgur.com/uD9c0sI.png" />
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<!-- PayPal SDK (replace YOUR_PAYPAL_CLIENT_ID) -->
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR"></script>
+
 <style>
   :root{
     --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ring:rgba(255,106,0,.28);
@@ -32,6 +36,7 @@
   .brand{display:flex; align-items:center; gap:10px}
   .brand h1{font-size:18px; margin:0}
   .logo{width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 0 2px rgba(255,106,0,.55))}
+
   .menu{display:flex; gap:14px; flex-wrap:wrap}
   .menu a{padding:8px 12px; border-radius:12px; color:var(--muted); transition:all .25s ease; border:1px solid transparent}
   .menu a:hover{color:var(--ink); border-color:rgba(255,255,255,.08); background:rgba(255,255,255,.03)}
@@ -57,10 +62,15 @@
   /* Commission slots */
   .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
   .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; cursor:pointer}
-  .slot.free{color:#0b0b0f; background:#ff6a00}
-  .slot.taken{color:#eaeaf1; background:#0b0b0f}
-  .slot:hover{transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
+  .slot{
+    border-radius:12px; padding:12px 10px; text-align:center; font-weight:800;
+    border:1px solid rgba(255,255,255,.08);
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+    cursor:pointer;
+  }
+  .slot.free{ color:#0b0b0f; }
+  .slot.taken{ color:#eaeaf1; }
+  .slot:hover{ transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6) }
 
   /* Gallery */
   .grid{display:grid; gap:14px}
@@ -93,22 +103,29 @@
   .ctrl:hover{background:#343541}
   .lb-close{position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none; border-radius:10px; padding:10px 12px; cursor:pointer}
 
-  /* Popup (slot message) */
+  /* Popup (slot/info + order form) */
   .overlay{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; z-index:110}
   .overlay.open{display:block}
   .popup{
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     background:linear-gradient(180deg,#141419,#0f0f14);
     border:1px solid rgba(255,255,255,.1);
-    border-radius:14px; padding:18px; width:min(92vw,420px);
-    display:none; z-index:120; text-align:center; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
+    border-radius:14px; padding:18px; width:min(92vw,520px);
+    display:none; z-index:120; text-align:left; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
+    animation:fadeIn .2s ease;
   }
   .popup.open{display:block}
+  @keyframes fadeIn{from{opacity:0; transform:translate(-50%,-46%)} to{opacity:1; transform:translate(-50%,-50%)}}
   .popup h3{margin:0 0 6px}
-  .popup p{margin:0 0 14px; color:var(--muted)}
-  .popup .pop-actions{display:flex; justify-content:center; gap:10px}
+  .popup p{margin:0 0 10px; color:var(--muted)}
+  .field{display:flex; flex-direction:column; gap:6px; margin:10px 0}
+  .field input, .field textarea{
+    background:#0f1016; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px; color:#fff;
+  }
+  .pop-actions{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px}
   .pop-btn{border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700}
-  .pop-ok{background:var(--accent); color:#0b0b0f}
+  .pop-ok{background:#2a2b32; color:#fff}
+  .pop-primary{background:var(--accent); color:#0b0b0f}
 
   /* --------- MOBILE BREAKPOINTS --------- */
   @media (max-width: 960px){
@@ -202,6 +219,12 @@
     <div class="section-head">
       <h2>Commissions & Prices</h2>
     </div>
+    <div class="panel p24 reveal" style="margin-bottom:12px">
+      <p class="muted" style="margin:0">
+        • No scene backgrounds — solid color or transparent PNG.<br/>
+        • Extra character: <span class="accent">+15€</span>.
+      </p>
+    </div>
     <div class="grid prices" id="pricesGrid"></div>
   </section>
 
@@ -234,7 +257,7 @@
   </div>
 </div>
 
-<!-- SLOT POPUP -->
+<!-- INFO POPUP (simple) -->
 <div id="slotOverlay" class="overlay" role="presentation"></div>
 <div id="slotPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="slotPopupTitle">
   <h3 id="slotPopupTitle">Slot status</h3>
@@ -244,10 +267,53 @@
   </div>
 </div>
 
+<!-- ORDER POPUP (form + PayPal) -->
+<div id="orderOverlay" class="overlay" role="presentation"></div>
+<div id="orderPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+  <h3 id="orderTitle">Order details</h3>
+  <p class="muted" id="orderSubtitle">Please include your email, a short brief, and optional references.</p>
+  <form id="orderForm">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" name="email" id="orderEmail" placeholder="you@example.com" required />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea name="description" id="orderDesc" rows="5" placeholder="Tell me about the character, pose, vibe, etc." required></textarea>
+    </div>
+    <div class="field">
+      <label>References (PNG/JPG, up to 5)</label>
+      <input type="file" name="refs" id="orderFiles" accept="image/png,image/jpeg" multiple />
+    </div>
+
+    <input type="hidden" name="package" id="orderPackage" />
+    <input type="hidden" name="price" id="orderPrice" />
+    <input type="hidden" name="slotIndex" id="orderSlotIndex" />
+
+    <div class="pop-actions">
+      <button type="button" class="pop-btn pop-ok" id="orderCancel">Cancel</button>
+      <button type="button" class="pop-btn pop-primary" id="orderNext">Proceed to PayPal</button>
+    </div>
+
+    <div id="paypalContainer" style="margin-top:12px; display:none"></div>
+    <div id="orderMsg" class="muted" style="margin-top:8px"></div>
+  </form>
+</div>
+
+<!-- Hidden Netlify form (lets Netlify detect & store submissions) -->
+<form name="commission" data-netlify="true" netlify-honeypot="bot-field" hidden enctype="multipart/form-data">
+  <input type="text" name="email" />
+  <input type="text" name="description" />
+  <input type="text" name="package" />
+  <input type="text" name="price" />
+  <input type="text" name="slotIndex" />
+  <input type="file" name="refs" multiple />
+</form>
+
 <div id="toast" style="position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111218; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); display:none">Copied!</div>
 
 <script>
-/* ============== CONFIG ============== */
+/* ================== CONFIG ================== */
 const CONFIG = {
   artistName: "Raffu's Drawing Wall",
   discordTag: "Raffu_",
@@ -267,20 +333,20 @@ const CONFIG = {
   ],
   prices: [
     { group: "Chest-up / Avatar Type", items: [
-      { label: "No color / Lineart", price: "15€" },
-      { label: "Colored Drawing",    price: "20€" }
+      { label: "No color / Lineart", price: "15€", amountEUR: 15 },
+      { label: "Colored Drawing",    price: "20€", amountEUR: 20 }
     ]},
     { group: "3 Quarters / Usual Drawing", items: [
-      { label: "No color / Lineart", price: "25€" },
-      { label: "Colored Drawing",    price: "30€" }
+      { label: "No color / Lineart", price: "25€", amountEUR: 25 },
+      { label: "Colored Drawing",    price: "30€", amountEUR: 30 }
     ]},
     { group: "Full Body / Character", items: [
-      { label: "No color / Lineart", price: "35€" },
-      { label: "Colored Drawing",    price: "40€" }
+      { label: "No color / Lineart", price: "35€", amountEUR: 35 },
+      { label: "Colored Drawing",    price: "40€", amountEUR: 40 }
     ]}
   ]
 };
-/* ==================================== */
+/* ============================================ */
 
 /* Branding & basics */
 document.title = `${CONFIG.artistName} — Art Portfolio & Commissions`;
@@ -303,10 +369,27 @@ document.getElementById('copyDiscord').onclick = async ()=>{
 /* =================== SLOTS (Netlify) =================== */
 const SLOT_API = '/.netlify/functions/slots';
 
+function normalizeFree(v){
+  if (v === true) return true;
+  if (v === false) return false;
+  if (typeof v === 'number') return v === 1;
+  if (typeof v === 'string'){ const s=v.trim().toLowerCase(); return (s==='true'||s==='1'||s==='free'); }
+  return false;
+}
+
 async function getSlots() {
   const r = await fetch(SLOT_API, { method: 'GET', cache: 'no-store' });
   const data = await r.json();
-  return data.slots || [true, true, true, true];
+  return Array.isArray(data.slots) ? data.slots : [true, true, true, true];
+}
+
+async function setSlot(slotIndex, reserve) {
+  const r = await fetch(SLOT_API, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ slot: slotIndex, reserve })
+  });
+  return r.json();
 }
 
 async function buildSlots() {
@@ -315,35 +398,28 @@ async function buildSlots() {
   grid.innerHTML = '';
 
   let slots;
-  try {
-    slots = await getSlots();
-  } catch (e) {
-    // if the function fails, show all taken (safe fallback)
-    slots = [false, false, false, false];
-  }
+  try { slots = await getSlots(); } catch(e){ slots = [false,false,false,false]; }
+
+  const freeColor  = CONFIG.commissions.freeColor;
+  const takenColor = CONFIG.commissions.takenColor;
 
   let freeCount = 0;
+  slots.forEach((val, i) => {
+    const isFree = normalizeFree(val);
+    if (isFree) freeCount++;
 
-  slots.forEach((isFree, i) => {
     const div = document.createElement('div');
     div.className = 'slot ' + (isFree ? 'free' : 'taken');
     div.textContent = `Slot ${i + 1}`;
-    div.style.background = isFree ? (CONFIG.commissions.freeColor || '#ff6a00')
-                                  : (CONFIG.commissions.takenColor || '#0b0b0f');
+    div.style.background = isFree ? freeColor : takenColor;
     div.style.borderColor = isFree ? 'transparent' : 'rgba(255,255,255,.12)';
-    if (isFree) freeCount++;
-
-    div.addEventListener('click', () => {
-      if (isFree) openPopup('✅ This slot is free to take!');
-      else openPopup('❌ This slot is currently unavailable');
-    });
-
+    div.addEventListener('click', () => openPopup(isFree ? '✅ This slot is free to take!' : '❌ This slot is currently unavailable'));
     grid.appendChild(div);
   });
 
   sum.textContent = `${freeCount}/${slots.length} free`;
 
-  // Disable "Request" buttons if no free slots
+  // Disable "Order" buttons if no free slots
   const anyFree = freeCount > 0;
   document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn => {
     if (!btn.dataset.baseText) btn.dataset.baseText = btn.textContent;
@@ -354,28 +430,153 @@ async function buildSlots() {
     btn.setAttribute('aria-disabled', String(!anyFree));
   });
 }
-/* ======================================================= */
 
-/* Prices (REQUEST -> Instagram for now) */
+/* =================== PRICES + ORDER FLOW =================== */
 const pricesGrid = document.getElementById('pricesGrid');
 CONFIG.prices.forEach(group=>{
   const card = document.createElement('div');
   card.className = 'price-card reveal';
+  const itemsHtml = group.items.map((it, idx)=>`
+    <li style="display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid rgba(255,255,255,.06)">
+      <span class="muted">${it.label}</span>
+      <strong class="price">${it.price}</strong>
+    </li>
+  `).join('');
   card.innerHTML = `
     <h3 style="margin:0 0 8px">${group.group}</h3>
-    <ul style="list-style:none; padding:0; margin:0">
-      ${group.items.map(it=>`
-        <li style="display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid rgba(255,255,255,.06)">
-          <span class="muted">${it.label}</span>
-          <strong class="price">${it.price}</strong>
-        </li>`).join('')}
-    </ul>
-    <a href="${CONFIG.instagramProfile}" target="_blank" rel="noopener" class="btn primary">Request ${group.group.split('/')[0].trim()}</a>
+    <ul style="list-style:none; padding:0; margin:0">${itemsHtml}</ul>
+    <button class="btn primary order-btn" data-group="${group.group}">Order ${group.group.split('/')[0].trim()}</button>
   `;
   pricesGrid.appendChild(card);
 });
 
-/* Gallery -> Lightbox */
+/* Attach order button events (open modal form) */
+document.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('.order-btn');
+  if(!btn) return;
+
+  // Find cheapest price in this group (or pick first)
+  const group = CONFIG.prices.find(g => g.group === btn.dataset.group);
+  const item  = group.items[0];
+  openOrderModal({
+    group: group.group,
+    priceLabel: item.price,
+    amountEUR: item.amountEUR || parseInt(item.price),
+  });
+});
+
+/* Order modal + PayPal */
+const orderOverlay   = document.getElementById('orderOverlay');
+const orderPopup     = document.getElementById('orderPopup');
+const orderForm      = document.getElementById('orderForm');
+const orderCancelBtn = document.getElementById('orderCancel');
+const orderNextBtn   = document.getElementById('orderNext');
+const paypalWrap     = document.getElementById('paypalContainer');
+const orderMsg       = document.getElementById('orderMsg');
+const orderEmail     = document.getElementById('orderEmail');
+const orderDesc      = document.getElementById('orderDesc');
+const orderFiles     = document.getElementById('orderFiles');
+const orderPkg       = document.getElementById('orderPackage');
+const orderPrice     = document.getElementById('orderPrice');
+const orderSlotIndex = document.getElementById('orderSlotIndex');
+
+let pendingOrder = null; // store info between steps
+
+function openOrderModal({group, priceLabel, amountEUR}){
+  orderPkg.value  = group;
+  orderPrice.value= priceLabel;
+  orderMsg.textContent = "";
+  paypalWrap.style.display = 'none';
+  orderNextBtn.style.display = 'inline-block';
+  orderOverlay.classList.add('open');
+  orderPopup.classList.add('open');
+  pendingOrder = { amountEUR };
+}
+function closeOrderModal(){
+  orderOverlay.classList.remove('open');
+  orderPopup.classList.remove('open');
+  pendingOrder = null;
+  // clean PayPal render area
+  paypalWrap.innerHTML = '';
+}
+
+/* Proceed to PayPal: validate form first, then render PayPal buttons */
+orderNextBtn.addEventListener('click', async ()=>{
+  if(!orderEmail.value || !orderDesc.value){
+    orderMsg.textContent = "Please fill your email and description first.";
+    return;
+  }
+  // ensure there is a free slot before showing PayPal
+  const slots = await getSlots();
+  const firstFree = slots.findIndex(s=>normalizeFree(s));
+  if(firstFree === -1){
+    orderMsg.textContent = "No slots available right now.";
+    return;
+  }
+  orderSlotIndex.value = String(firstFree);
+
+  // lock UI into PayPal step
+  orderNextBtn.style.display = 'none';
+  paypalWrap.style.display = 'block';
+  orderMsg.textContent = "Complete payment to reserve your slot.";
+
+  // Render PayPal
+  paypal.Buttons({
+    style: { shape:'pill', layout:'vertical' },
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          amount: { value: String(pendingOrder.amountEUR), currency_code: 'EUR' },
+          description: `${orderPkg.value} — ${orderPrice.value}`
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      const details = await actions.order.capture();
+      // Reserve the slot
+      const idx = parseInt(orderSlotIndex.value, 10);
+      try{
+        await setSlot(idx, true);
+      }catch(e){ /* ignore for now */ }
+
+      // Submit the form to Netlify Forms with files + PayPal data
+      await submitNetlifyForm(details);
+
+      // close, refresh slots
+      closeOrderModal();
+      openPopup('✅ Payment received! Your slot is reserved. I will contact you by email.');
+      buildSlots();
+    },
+    onError: (err) => {
+      orderMsg.textContent = "PayPal error. Please try again.";
+    },
+    onCancel: () => {
+      orderMsg.textContent = "Payment cancelled.";
+    }
+  }).render('#paypalContainer');
+});
+
+/* Submit to Netlify Forms (stores in Netlify > Forms) */
+async function submitNetlifyForm(paypalDetails){
+  const fd = new FormData();
+  fd.append('form-name', 'commission');
+  fd.append('email', orderEmail.value);
+  fd.append('description', orderDesc.value);
+  fd.append('package', orderPkg.value);
+  fd.append('price', orderPrice.value);
+  fd.append('slotIndex', orderSlotIndex.value);
+  fd.append('paypal_order_id', paypalDetails.id || '');
+  fd.append('paypal_payer_email', paypalDetails?.payer?.email_address || '');
+  // files
+  Array.from(orderFiles.files || []).slice(0,5).forEach(f => fd.append('refs', f, f.name));
+
+  await fetch('/', { method:'POST', body:fd });
+}
+
+/* Cancel order */
+orderCancelBtn.addEventListener('click', closeOrderModal);
+
+/* =================== GALLERY + LIGHTBOX =================== */
 const grid = document.getElementById('instaGrid');
 CONFIG.galleryImages.forEach(src=>{
   const card = document.createElement('div');
@@ -454,12 +655,11 @@ lbStage.addEventListener('dblclick', (e)=>{
   if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
 });
 
-/* Popup helpers */
+/* Simple info popup */
 const slotOverlay = document.getElementById('slotOverlay');
 const slotPopup = document.getElementById('slotPopup');
 const slotMsg = document.getElementById('slotPopupMsg');
 const slotOk = document.getElementById('slotOk');
-
 function openPopup(message){
   slotMsg.textContent = message;
   slotOverlay.classList.add('open');
@@ -481,7 +681,8 @@ ham.addEventListener('click', ()=>{
 });
 
 /* Kick things off */
-buildSlots(); // <-- important: fetches real slot state and paints UI
+buildSlots();
 </script>
 </body>
 </html>
+
