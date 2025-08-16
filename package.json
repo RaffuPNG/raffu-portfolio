@@ -1,0 +1,9 @@
+{
+  "name": "raffu-portfolio",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0",
+    "@netlify/functions": "^2.6.0"
+  }
+}
