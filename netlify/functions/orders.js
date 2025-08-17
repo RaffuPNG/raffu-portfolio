@@ -8,26 +8,29 @@ const base = {
   'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 };
+const json = (status, data) =>
+  new Response(JSON.stringify(data), { status, headers: base });
 
-export default async (event, context) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: base };
+export default async (request, context) => {
+  if (request.method === 'OPTIONS') return new Response('', { status: 204, headers: base });
 
-  const isAuthed = !!context.clientContext?.user;
+  const isAuthed = !!context?.clientContext?.user;
 
   try {
     const store = getStore({ name: 'commission-orders' });
-
     const read = async () => (await store.get(KEY, { type: 'json', consistency: 'strong' })) || [];
     const write = async (v) => { await store.setJSON(KEY, v); };
 
-    if (event.httpMethod === 'GET') {
-      if (!isAuthed) return { statusCode: 401, headers: base, body: JSON.stringify({ error: 'auth required' }) };
+    if (request.method === 'GET') {
+      if (!isAuthed) return json(401, { error: 'auth required' });
       const orders = await read();
-      return { statusCode: 200, headers: base, body: JSON.stringify({ orders }) };
+      return json(200, { orders });
     }
 
-    if (event.httpMethod === 'POST') {
-      const body = JSON.parse(event.body || '{}');
+    if (request.method === 'POST') {
+      let body = {};
+      try { body = await request.json(); } catch { body = {}; }
+
       const orders = await read();
       const id = 'ord_' + Math.random().toString(36).slice(2, 9);
 
@@ -48,23 +51,27 @@ export default async (event, context) => {
       });
 
       await write(orders);
-      return { statusCode: 200, headers: base, body: JSON.stringify({ ok: true, id }) };
+      return json(200, { ok: true, id });
     }
 
-    if (event.httpMethod === 'PUT') {
-      if (!isAuthed) return { statusCode: 401, headers: base, body: JSON.stringify({ error: 'auth required' }) };
-      const { id, status } = JSON.parse(event.body || '{}');
+    if (request.method === 'PUT') {
+      if (!isAuthed) return json(401, { error: 'auth required' });
+      let body = {};
+      try { body = await request.json(); } catch { body = {}; }
+      const { id, status } = body;
+
       const orders = await read();
       const i = orders.findIndex(o => o.id === id);
-      if (i === -1) return { statusCode: 404, headers: base, body: JSON.stringify({ error: 'not found' }) };
+      if (i === -1) return json(404, { error: 'not found' });
+
       orders[i].status = status || orders[i].status;
       await write(orders);
-      return { statusCode: 200, headers: base, body: JSON.stringify({ ok: true }) };
+      return json(200, { ok: true });
     }
 
-    return { statusCode: 405, headers: base, body: JSON.stringify({ error: 'method not allowed' }) };
+    return json(405, { error: 'method not allowed' });
   } catch (e) {
     console.error('orders error:', e);
-    return { statusCode: 500, headers: base, body: JSON.stringify({ error: e?.message || String(e) }) };
+    return json(500, { error: e?.message || String(e) });
   }
 };
