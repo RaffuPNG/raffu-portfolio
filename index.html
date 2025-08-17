@@ -21,7 +21,6 @@
   body{margin:0; background:linear-gradient(180deg,#0b0b0f 0%, #0b0b0f 40%, #0f0f15 100%); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   a{color:inherit; text-decoration:none} img{max-width:100%; display:block}
   .wrap{max-width:1100px; margin:0 auto; padding:24px}
-
   header{position:sticky; top:0; z-index:50; backdrop-filter: blur(10px);
     background:linear-gradient(to bottom, rgba(11,11,15,.85), rgba(11,11,15,.35)); border-bottom:1px solid rgba(255,255,255,.06)}
   .nav{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0}
@@ -48,12 +47,13 @@
 
   .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
   .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800;
-    border:1px solid rgba(255,255,255,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease; cursor:pointer;}
+  .slot{border-radius:12px; padding:12px 10px; text-align:center; font-weight:800; border:1px solid rgba(255,255,255,.08);
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease; cursor:pointer;}
   .slot.free{ color:#0b0b0f; } .slot.taken{ color:#eaeaf1; } .slot:hover{ transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6) }
 
   .grid{display:grid; gap:14px} .insta-grid{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
-  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06);
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
   .img-card img{width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; background:var(--bg); transition:transform .35s ease; display:block}
   .img-card:hover{transform:scale(1.035); box-shadow:0 18px 50px -18px rgba(0,0,0,.6), 0 0 0 6px var(--ring); border-color:rgba(255,255,255,.12)}
   .img-card:hover img{transform:scale(1.03)}
@@ -249,9 +249,10 @@
     <input type="hidden" name="extras" id="orderExtras" value="0" />
     <input type="hidden" name="totalEUR" id="orderTotalEUR" value="0" />
 
-    <div class="pop-actions">
+    <div class="pop-actions" style="gap:8px; flex-wrap:wrap">
       <button type="button" class="pop-btn pop-ok" id="orderCancel">Cancel</button>
-      <button type="button" class="pop-btn pop-primary" id="orderNext">Proceed to PayPal</button>
+      <button type="button" class="pop-btn pop-primary" id="orderNext">Pay with PayPal</button>
+      <button type="button" class="pop-btn" id="payWithMe" title="If PayPal has issues, use my PayPal.me link">Use PayPal.me</button>
     </div>
 
     <div id="paypalContainer" style="margin-top:12px; display:none"></div>
@@ -268,6 +269,9 @@
   <input type="text" name="slotIndex" />
   <input type="text" name="extras" />
   <input type="text" name="totalEUR" />
+  <input type="text" name="payment_method" />
+  <input type="text" name="paypal_order_id" />
+  <input type="text" name="paypal_payer_email" />
   <input type="file" name="refs" multiple />
 </form>
 
@@ -280,6 +284,7 @@ const CONFIG = {
   discordTag: "Raffu_",
   accent: "#ff6a00",
   instagramProfile: "https://www.instagram.com/raffu.draws/",
+  paypalMe: "https://paypal.me/raffudraws", // <— fallback link
   commissions: { maxSlots: 4, freeColor: "#ff6a00", takenColor: "#0b0b0f" },
   extras: { pricePerExtraEUR: 15, maxExtras: 5 },
   galleryImages: [
@@ -422,6 +427,7 @@ const orderOverlay   = document.getElementById('orderOverlay');
 const orderPopup     = document.getElementById('orderPopup');
 const orderCancelBtn = document.getElementById('orderCancel');
 const orderNextBtn   = document.getElementById('orderNext');
+const payWithMeBtn   = document.getElementById('payWithMe');
 const paypalWrap     = document.getElementById('paypalContainer');
 const orderMsg       = document.getElementById('orderMsg');
 const orderEmail     = document.getElementById('orderEmail');
@@ -482,7 +488,6 @@ orderNextBtn.addEventListener('click', async ()=>{
     orderMsg.textContent = "Please fill your email and description first.";
     return;
   }
-  // ensure there is a free slot before showing PayPal
   const slots = await getSlots();
   const firstFree = slots.findIndex(s=>normalizeFree(s));
   if(firstFree === -1){
@@ -491,12 +496,10 @@ orderNextBtn.addEventListener('click', async ()=>{
   }
   orderSlotIndex.value = String(firstFree);
 
-  // lock UI into PayPal step
   orderNextBtn.style.display = 'none';
   paypalWrap.style.display = 'block';
   orderMsg.textContent = "Complete payment to reserve your slot.";
 
-  // Render PayPal (LIVE SDK already loaded above)
   paypal.Buttons({
     style: { shape:'pill', layout:'vertical' },
     createOrder: (data, actions) => {
@@ -517,39 +520,54 @@ orderNextBtn.addEventListener('click', async ()=>{
     },
     onApprove: async (data, actions) => {
       const details = await actions.order.capture();
-      // Reserve the slot
       const idx = parseInt(orderSlotIndex.value, 10);
-      try{ await setSlot(idx, true); }catch(e){ /* ignore for now */ }
-
-      // Submit the form to Netlify Forms with files + PayPal data
-      await submitNetlifyForm(details);
-
-      // close, refresh slots
+      try{ await setSlot(idx, true); }catch(e){}
+      await submitNetlifyForm(details, 'paypal');
       closeOrderModal();
       openPopup('✅ Payment received! Your slot is reserved. I will contact you by email.');
       buildSlots();
     },
-    onError: () => { orderMsg.textContent = "PayPal error. Please try again."; },
-    onCancel: () => { orderMsg.textContent = "Payment cancelled."; }
+    onError: (err) => {
+      console.error('PayPal onError', err);
+      orderMsg.textContent = "PayPal error. You can retry, or use PayPal.me below.";
+      payWithMeBtn.focus();
+    },
+    onCancel: () => {
+      orderMsg.textContent = "Payment cancelled.";
+    }
   }).render('#paypalContainer');
 });
 
+/* PayPal.me fallback */
+payWithMeBtn.addEventListener('click', async ()=>{
+  if(!orderEmail.value || !orderDesc.value){
+    orderMsg.textContent = "Please fill your email and description first.";
+    return;
+  }
+  // We still store the order in Netlify Forms for you to see.
+  await submitNetlifyForm(null, 'paypal.me');
+  const total = Number(orderTotalEUR.value||'0') || 0;
+  const url = `${CONFIG.paypalMe}/${total}EUR`;
+  window.open(url, '_blank', 'noopener');
+
+  orderMsg.textContent = "Opened PayPal.me in a new tab. After payment, I’ll verify and confirm your slot by email. (Slot isn’t auto-reserved on this method.)";
+});
+
 /* Submit to Netlify Forms (stores in Netlify > Forms) */
-async function submitNetlifyForm(paypalDetails){
+async function submitNetlifyForm(paypalDetails, method){
   const fd = new FormData();
   fd.append('form-name', 'commission');
   fd.append('email', orderEmail.value);
   fd.append('description', orderDesc.value);
   fd.append('package', orderPkg.value);
   fd.append('price', orderPrice.value);
-  fd.append('slotIndex', orderSlotIndex.value);
+  fd.append('slotIndex', orderSlotIndex.value || '');
   fd.append('extras', orderExtras.value);
   fd.append('totalEUR', orderTotalEUR.value);
-  fd.append('paypal_order_id', paypalDetails.id || '');
+  fd.append('payment_method', method || 'paypal');
+  fd.append('paypal_order_id', paypalDetails?.id || '');
   fd.append('paypal_payer_email', paypalDetails?.payer?.email_address || '');
-  // files (cap 5)
   Array.from(orderFiles.files || []).slice(0,5).forEach(f => fd.append('refs', f, f.name));
-
   await fetch('/', { method:'POST', body:fd });
 }
 
