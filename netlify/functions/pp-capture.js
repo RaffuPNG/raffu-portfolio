@@ -1,6 +1,5 @@
 import { getStore } from '@netlify/blobs';
 
-const ORDERS = getStore({ name: 'commission-orders' });
 const KEY = 'orders';
 
 const ENV = (process.env.PAYPAL_ENV || 'live').toLowerCase();
@@ -20,14 +19,17 @@ async function token() {
   return j.access_token;
 }
 
+const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+
 export default async (event, context) => {
-  const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
   if (!context.clientContext?.user) return { statusCode: 401, headers, body: JSON.stringify({ error: 'auth required' }) };
 
   try {
-    const { id } = JSON.parse(event.body || '{}'); // our order id
-    const orders = await ORDERS.get(KEY, { type: 'json', consistency: 'strong' }) || [];
+    const store = getStore({ name: 'commission-orders' });
+    const { id } = JSON.parse(event.body || '{}');
+
+    const orders = (await store.get(KEY, { type: 'json', consistency: 'strong' })) || [];
     const o = orders.find(x => x.id === id);
     if (!o) return { statusCode: 404, headers, body: JSON.stringify({ error: 'order not found' }) };
 
@@ -41,10 +43,11 @@ export default async (event, context) => {
     if (!r.ok) throw new Error(j.message || 'capture failed');
 
     o.status = 'captured';
-    await ORDERS.setJSON(KEY, orders);
+    await store.setJSON(KEY, orders);
 
     return { statusCode: 200, headers, body: JSON.stringify({ ok: true, capture: j }) };
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
+    console.error('pp-capture error:', e);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e?.message || String(e) }) };
   }
 };
