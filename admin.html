@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Admin — Commission Slots</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<!-- Netlify Identity widget must be loaded on this page -->
 <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
   :root{ --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ok:#18c964; --bad:#ff4d4d; }
-  *{box-sizing:border-box} body{margin:0; font-family:Inter,system-ui; background:linear-gradient(180deg,#0b0b0f,#0f0f15); color:var(--ink)}
+  *{box-sizing:border-box}
+  body{margin:0; font-family:Inter,system-ui; background:linear-gradient(180deg,#0b0b0f,#0f0f15); color:var(--ink)}
   .wrap{max-width:900px; margin:0 auto; padding:20px}
   h1{margin:10px 0 16px}
   .panel{background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px}
@@ -23,7 +23,7 @@
   .ok{background:var(--ok); color:#0b0b0f}
   .bad{background:var(--bad); color:#0b0b0f}
   .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
-  .notice{background:#111218; border:1px solid rgba(255,255,255,.08); padding:10px 12px; border-radius:10px; }
+  .notice{background:#111218; border:1px solid rgba(255,255,255,.08); padding:10px 12px; border-radius:10px;}
   .hidden{display:none}
 </style>
 </head>
@@ -42,23 +42,25 @@
   <div id="app" class="panel hidden">
     <div class="row" style="margin-bottom:10px">
       <div class="muted" id="adminEmail"></div>
-      <button id="refreshBtn" class="btn">Refresh</button>
+      <div style="display:flex;gap:8px">
+        <button id="refreshBtn" class="btn">Refresh</button>
+        <button id="forceBtn" class="btn">Force render</button>
+      </div>
     </div>
     <div class="grid" id="slotGrid"></div>
   </div>
 </div>
 
 <script>
-/* ---------- Admin Dashboard Logic ---------- */
 const ADMIN_FN = '/.netlify/functions/admin-slots';
-
-const slotGrid      = document.getElementById('slotGrid');
-const app           = document.getElementById('app');
-const guard         = document.getElementById('guard');
-const loginBtn      = document.getElementById('loginBtn');
-const logoutBtn     = document.getElementById('logoutBtn');
-const refreshBtn    = document.getElementById('refreshBtn');
-const adminEmailEl  = document.getElementById('adminEmail');
+const slotGrid = document.getElementById('slotGrid');
+const app = document.getElementById('app');
+const guard = document.getElementById('guard');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const forceBtn = document.getElementById('forceBtn');
+const adminEmailEl = document.getElementById('adminEmail');
 
 function showApp(show){
   app.classList.toggle('hidden', !show);
@@ -113,7 +115,7 @@ slotGrid.addEventListener('click', async (e)=>{
   const btn = e.target.closest('button[data-act]');
   if(!btn) return;
   const i = parseInt(btn.dataset.i,10);
-  const act = btn.dataset.act; // free | take
+  const act = btn.dataset.act;
   try{
     await api('', { method:'POST', body: JSON.stringify({ slot:i, free:(act==='free') }) });
     await loadSlots();
@@ -123,6 +125,13 @@ slotGrid.addEventListener('click', async (e)=>{
 });
 
 refreshBtn.addEventListener('click', loadSlots);
+forceBtn.addEventListener('click', async ()=>{
+  const u = netlifyIdentity.currentUser();
+  if(!u){ setGuard('No Identity session yet — click Log in.'); return; }
+  adminEmailEl.textContent = 'Signed in as: ' + (u.email || '');
+  showApp(true);
+  try { await loadSlots(); } catch(e){ alert('Load error: ' + e.message); }
+});
 loginBtn.addEventListener('click', ()=> netlifyIdentity.open('login'));
 logoutBtn.addEventListener('click', ()=> netlifyIdentity.logout());
 
@@ -131,15 +140,14 @@ async function onReady(){
   if(user){
     adminEmailEl.textContent = 'Signed in as: ' + (user.email || '');
     showApp(true);
-    try { await loadSlots(); }
-    catch(err){ alert('Load error: ' + err.message); }
+    try { await loadSlots(); } catch(err){ setGuard('Load error: ' + err.message); }
   }else{
     showApp(false);
     setGuard('Please log in to manage slots.');
   }
 }
 
-// Attach listeners before init
+// Attach handlers then init
 netlifyIdentity.on('init', onReady);
 netlifyIdentity.on('login', async (user)=>{
   adminEmailEl.textContent = 'Signed in as: ' + (user?.email || '');
@@ -152,10 +160,23 @@ netlifyIdentity.on('logout', ()=>{
   showApp(false);
   setGuard('Please log in to manage slots.');
 });
-
 netlifyIdentity.init();
-// fallback in case init fired before handlers
-setTimeout(onReady, 250);
+
+// POLL fallback: if init fired before handlers or widget is slow
+let tries = 0;
+const poll = setInterval(async ()=>{
+  tries++;
+  const u = netlifyIdentity.currentUser?.();
+  if (u){
+    clearInterval(poll);
+    adminEmailEl.textContent = 'Signed in as: ' + (u.email || '');
+    showApp(true);
+    try { await loadSlots(); } catch(err){ alert('Load error: ' + err.message); }
+  } else if (tries > 40){ // ~20s
+    clearInterval(poll);
+    setGuard('Please log in to manage slots.');
+  }
+}, 500);
 </script>
 </body>
 </html>
