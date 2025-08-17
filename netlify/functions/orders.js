@@ -1,6 +1,5 @@
 import { getStore } from '@netlify/blobs';
 
-const STORE = getStore({ name: 'commission-orders' });
 const KEY = 'orders';
 
 const base = {
@@ -12,12 +11,15 @@ const base = {
 
 export default async (event, context) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: base };
+
   const isAuthed = !!context.clientContext?.user;
 
-  const read = async () => (await STORE.get(KEY, { type: 'json', consistency: 'strong' })) || [];
-  const write = async (v) => { await STORE.setJSON(KEY, v); };
-
   try {
+    const store = getStore({ name: 'commission-orders' });
+
+    const read = async () => (await store.get(KEY, { type: 'json', consistency: 'strong' })) || [];
+    const write = async (v) => { await store.setJSON(KEY, v); };
+
     if (event.httpMethod === 'GET') {
       if (!isAuthed) return { statusCode: 401, headers: base, body: JSON.stringify({ error: 'auth required' }) };
       const orders = await read();
@@ -28,6 +30,7 @@ export default async (event, context) => {
       const body = JSON.parse(event.body || '{}');
       const orders = await read();
       const id = 'ord_' + Math.random().toString(36).slice(2, 9);
+
       orders.unshift({
         id,
         createdAt: Date.now(),
@@ -43,14 +46,14 @@ export default async (event, context) => {
         paypalAuthId: body.paypalAuthId || '',
         payerEmail: body.payerEmail || ''
       });
+
       await write(orders);
       return { statusCode: 200, headers: base, body: JSON.stringify({ ok: true, id }) };
     }
 
     if (event.httpMethod === 'PUT') {
       if (!isAuthed) return { statusCode: 401, headers: base, body: JSON.stringify({ error: 'auth required' }) };
-      const body = JSON.parse(event.body || '{}');
-      const { id, status } = body;
+      const { id, status } = JSON.parse(event.body || '{}');
       const orders = await read();
       const i = orders.findIndex(o => o.id === id);
       if (i === -1) return { statusCode: 404, headers: base, body: JSON.stringify({ error: 'not found' }) };
@@ -61,6 +64,7 @@ export default async (event, context) => {
 
     return { statusCode: 405, headers: base, body: JSON.stringify({ error: 'method not allowed' }) };
   } catch (e) {
-    return { statusCode: 500, headers: base, body: JSON.stringify({ error: e.message }) };
+    console.error('orders error:', e);
+    return { statusCode: 500, headers: base, body: JSON.stringify({ error: e?.message || String(e) }) };
   }
 };
