@@ -1,6 +1,5 @@
 import { getStore } from '@netlify/blobs';
 
-const store = getStore({ name: 'commission-slots' });
 const KEY = 'status';
 const DEFAULT = [true, true, true, true];
 
@@ -11,24 +10,26 @@ const base = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 };
 
-export default async (event, context) => {
+export default async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: base };
 
   try {
+    // Create the store inside the handler (so errors are caught)
+    const store = getStore({ name: 'commission-slots' });
+
     if (event.httpMethod === 'GET') {
-      const slots = await store.get(KEY, { type: 'json', consistency: 'strong' }) || DEFAULT;
+      let slots = await store.get(KEY, { type: 'json', consistency: 'strong' });
+      if (!Array.isArray(slots)) slots = DEFAULT.slice();
       return { statusCode: 200, headers: base, body: JSON.stringify({ slots }) };
     }
 
     if (event.httpMethod === 'POST') {
-      const body = JSON.parse(event.body || '{}');
-      const { slot, reserve } = body;
+      const { slot, reserve } = JSON.parse(event.body || '{}'); // reserve=true -> TAKEN, false -> FREE
       let slots = await store.get(KEY, { type: 'json', consistency: 'strong' }) || DEFAULT.slice();
-      if (typeof slot !== 'number' || slot < 0 || slot > 3) {
-        return { statusCode: 400, headers: base, body: JSON.stringify({ error: 'bad slot' }) };
+
+      if (typeof slot !== 'number' || slot < 0 || slot >= slots.length) {
+        return { statusCode: 400, headers: base, body: JSON.stringify({ error: 'invalid slot' }) };
       }
-      slots[slot] = !reserve ? true : false; // reserve=true -> taken=false (set to false)
-      // clearer: when reserve true, mark as taken (false). when false, free (true)
       slots[slot] = reserve ? false : true;
       await store.setJSON(KEY, slots);
       return { statusCode: 200, headers: base, body: JSON.stringify({ ok: true, slots }) };
@@ -36,6 +37,7 @@ export default async (event, context) => {
 
     return { statusCode: 405, headers: base, body: JSON.stringify({ error: 'method not allowed' }) };
   } catch (e) {
-    return { statusCode: 500, headers: base, body: JSON.stringify({ error: e.message }) };
+    console.error('slots error:', e);
+    return { statusCode: 500, headers: base, body: JSON.stringify({ error: e?.message || String(e) }) };
   }
 };
