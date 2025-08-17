@@ -1,7 +1,6 @@
 {
   "name": "raffu-commissions",
   "private": true,
-  "type": "module",
   "dependencies": {
     "@netlify/blobs": "^5.0.0"
   }
