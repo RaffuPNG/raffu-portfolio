@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8">
+<script src="https://www.paypal.com/sdk/js?client-id=AT62TQ2d-mvHP4LOD-ztxUKgYBWtQhAYGCOXKLbw0l11GrFfNSv-Q2IPIBo1Q3huOQr2qNcne0-Qrj14&currency=EUR&intent=capture&debug=true"></script>
+<div id="btns" style="margin:40px"></div>
+<script>
+  paypal.Buttons({
+    style:{shape:'pill', layout:'vertical'},
+    createOrder:(data, actions)=>actions.order.create({
+      purchase_units:[{ amount:{ value:'1.00', currency_code:'EUR' }, description:'Test €1.00' }]
+    }),
+    onApprove: async (data, actions)=>{
+      const d = await actions.order.capture();
+      alert('Paid: ' + d.id);
+      console.log('CAPTURE', d);
+    },
+    onError: (err)=>{
+      console.error('LIVE TEST ERROR', err);
+      alert('PayPal error - see console');
+    }
+  }).render('#btns');
+</script>
