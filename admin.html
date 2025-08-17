@@ -1,4 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Commission Slots</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<!-- Netlify Identity widget must be loaded on this page -->
+<script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+  :root{ --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ok:#18c964; --bad:#ff4d4d; }
+  *{box-sizing:border-box} body{margin:0; font-family:Inter,system-ui; background:linear-gradient(180deg,#0b0b0f,#0f0f15); color:var(--ink)}
+  .wrap{max-width:900px; margin:0 auto; padding:20px}
+  h1{margin:10px 0 16px}
+  .panel{background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .slot{border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px}
+  .slot h3{margin:0 0 6px}
+  .muted{color:var(--muted)}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:8px}
+  button{border:none; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer}
+  .btn{background:#2a2b32; color:#fff}
+  .ok{background:var(--ok); color:#0b0b0f}
+  .bad{background:var(--bad); color:#0b0b0f}
+  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+  .notice{background:#111218; border:1px solid rgba(255,255,255,.08); padding:10px 12px; border-radius:10px; }
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>Admin Dashboard — Slots</h1>
+    <div>
+      <button id="loginBtn" class="btn">Log in</button>
+      <button id="logoutBtn" class="btn hidden">Log out</button>
+    </div>
+  </div>
+
+  <div id="guard" class="notice">Loading…</div>
+
+  <div id="app" class="panel hidden">
+    <div class="row" style="margin-bottom:10px">
+      <div class="muted" id="adminEmail"></div>
+      <button id="refreshBtn" class="btn">Refresh</button>
+    </div>
+    <div class="grid" id="slotGrid"></div>
+  </div>
+</div>
+
 <script>
+/* ---------- Admin Dashboard Logic ---------- */
 const ADMIN_FN = '/.netlify/functions/admin-slots';
 
 const slotGrid      = document.getElementById('slotGrid');
@@ -15,7 +66,6 @@ function showApp(show){
   loginBtn.classList.toggle('hidden', show);
   logoutBtn.classList.toggle('hidden', !show);
 }
-
 function setGuard(msg){ guard.textContent = msg; }
 
 async function currentJWT(){
@@ -76,7 +126,6 @@ refreshBtn.addEventListener('click', loadSlots);
 loginBtn.addEventListener('click', ()=> netlifyIdentity.open('login'));
 logoutBtn.addEventListener('click', ()=> netlifyIdentity.logout());
 
-// Robust login detection
 async function onReady(){
   const user = netlifyIdentity.currentUser();
   if(user){
@@ -90,6 +139,7 @@ async function onReady(){
   }
 }
 
+// Attach listeners before init
 netlifyIdentity.on('init', onReady);
 netlifyIdentity.on('login', async (user)=>{
   adminEmailEl.textContent = 'Signed in as: ' + (user?.email || '');
@@ -104,7 +154,8 @@ netlifyIdentity.on('logout', ()=>{
 });
 
 netlifyIdentity.init();
-
-// If the init event fired before listeners attached, force a check:
-setTimeout(onReady, 200);
+// fallback in case init fired before handlers
+setTimeout(onReady, 250);
 </script>
+</body>
+</html>
