@@ -109,14 +109,17 @@
       <h1 id="artistName">Raffu</h1>
     </div>
     <nav class="menu" id="menu">
-      <a href="#home">Home</a> <a href="#gallery">Gallery</a>
-      <a href="#commissions">Commissions</a> <a href="#contact" class="cta">Contact</a>
+      <a href="#home">Home</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#commissions">Commissions</a>
+      <a href="#contact" class="cta">Contact</a>
     </nav>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
   </div>
 </header>
 
 <main class="wrap">
+  <!-- HERO -->
   <section id="home" class="hero">
     <div class="card p24 reveal">
       <div class="chip">Commission me!</div>
@@ -127,12 +130,17 @@
     <div class="card p16 reveal">
       <div class="panel p16" style="border-radius:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
-          <div><div class="muted" style="font-size:13px">Current time (your device)</div>
-            <div id="currentTime" style="font-size:18px; font-weight:800"></div></div>
-          <div><div class="muted" style="font-size:13px">My timezone</div>
-            <div id="myTz" style="font-size:16px; font-weight:700">Europe</div></div>
+          <div>
+            <div class="muted" style="font-size:13px">Current time (your device)</div>
+            <div id="currentTime" style="font-size:18px; font-weight:800"></div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:13px">My timezone</div>
+            <div id="myTz" style="font-size:16px; font-weight:700">Europe</div>
+          </div>
         </div>
 
+        <!-- Commission slots -->
         <div style="height:10px"></div>
         <div class="comm-head">
           <strong>Ongoing Commissions</strong>
@@ -143,13 +151,19 @@
     </div>
   </section>
 
+  <!-- GALLERY -->
   <section id="gallery">
-    <div class="section-head"><h2>Gallery</h2></div>
+    <div class="section-head">
+      <h2>Gallery</h2>
+    </div>
     <div id="instaGrid" class="grid insta-grid"></div>
   </section>
 
+  <!-- COMMISSIONS -->
   <section id="commissions">
-    <div class="section-head"><h2>Commissions & Prices</h2></div>
+    <div class="section-head">
+      <h2>Commissions & Prices</h2>
+    </div>
     <div class="panel p24 reveal" style="margin-bottom:12px">
       <p class="muted" style="margin:0">
         • No scene backgrounds — solid color or transparent PNG.<br/>
@@ -159,6 +173,7 @@
     <div class="grid prices" id="pricesGrid"></div>
   </section>
 
+  <!-- CONTACT -->
   <section id="contact" class="reveal">
     <div class="panel p24">
       <h2>Contact</h2>
@@ -170,12 +185,16 @@
   </section>
 </main>
 
-<footer>© <span id="year"></span> <span id="footerName">Raffu</span>. All rights reserved.</footer>
+<footer>
+  © <span id="year"></span> <span id="footerName">Raffu</span>. All rights reserved.
+</footer>
 
 <!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer">
   <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
-  <div class="lb-stage" id="lbStage"><img id="lbImg" class="lb-img" alt="Artwork" /></div>
+  <div class="lb-stage" id="lbStage">
+    <img id="lbImg" class="lb-img" alt="Artwork" />
+  </div>
   <div class="lb-controls">
     <button class="ctrl" id="zoomOut" aria-label="Zoom out">−</button>
     <button class="ctrl" id="zoomIn" aria-label="Zoom in">+</button>
@@ -183,28 +202,36 @@
   </div>
 </div>
 
-<!-- INFO POPUP -->
+<!-- INFO POPUP (simple) -->
 <div id="slotOverlay" class="overlay" role="presentation"></div>
 <div id="slotPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="slotPopupTitle">
   <h3 id="slotPopupTitle">Slot status</h3>
   <p id="slotPopupMsg"></p>
-  <div class="pop-actions"><button class="pop-btn pop-ok" id="slotOk">OK</button></div>
+  <div class="pop-actions">
+    <button class="pop-btn pop-ok" id="slotOk">OK</button>
+  </div>
 </div>
 
-<!-- ORDER POPUP -->
+<!-- ORDER POPUP (form + PayPal) -->
 <div id="orderOverlay" class="overlay" role="presentation"></div>
 <div id="orderPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
   <h3 id="orderTitle">Order details</h3>
   <p class="muted" id="orderSubtitle">Please include your email, a short brief, and optional references.</p>
   <form id="orderForm">
-    <div class="field"><label>Email</label>
-      <input type="email" name="email" id="orderEmail" placeholder="you@example.com" required /></div>
-    <div class="field"><label>Description</label>
-      <textarea name="description" id="orderDesc" rows="5" placeholder="Tell me about the character, pose, vibe, etc." required></textarea></div>
-    <div class="field"><label>References (PNG/JPG, up to 5)</label>
-      <input type="file" name="refs" id="orderFiles" accept="image/png,image/jpeg" multiple /></div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" name="email" id="orderEmail" placeholder="you@example.com" required />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea name="description" id="orderDesc" rows="5" placeholder="Tell me about the character, pose, vibe, etc." required></textarea>
+    </div>
+    <div class="field">
+      <label>References (PNG/JPG, up to 5)</label>
+      <input type="file" name="refs" id="orderFiles" accept="image/png,image/jpeg" multiple />
+    </div>
 
-    <!-- Extra characters -->
+    <!-- Extras -->
     <div class="field">
       <label>Extra characters <span class="muted">(+15€ each, max 5)</span></label>
       <div style="display:flex; align-items:center; gap:8px;">
@@ -232,12 +259,16 @@
   </form>
 </div>
 
-<!-- Hidden Netlify form (registers schema) -->
+<!-- Hidden Netlify form (lets Netlify detect & store submissions) -->
 <form name="commission" data-netlify="true" netlify-honeypot="bot-field" hidden enctype="multipart/form-data">
-  <input type="text" name="email" /><input type="text" name="description" />
-  <input type="text" name="package" /><input type="text" name="price" />
-  <input type="text" name="slotIndex" /><input type="text" name="extras" />
-  <input type="text" name="totalEUR" /><input type="file" name="refs" multiple />
+  <input type="text" name="email" />
+  <input type="text" name="description" />
+  <input type="text" name="package" />
+  <input type="text" name="price" />
+  <input type="text" name="slotIndex" />
+  <input type="text" name="extras" />
+  <input type="text" name="totalEUR" />
+  <input type="file" name="refs" multiple />
 </form>
 
 <div id="toast" style="position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111218; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); display:none">Copied!</div>
@@ -252,8 +283,11 @@ const CONFIG = {
   commissions: { maxSlots: 4, freeColor: "#ff6a00", takenColor: "#0b0b0f" },
   extras: { pricePerExtraEUR: 15, maxExtras: 5 },
   galleryImages: [
-    "https://i.imgur.com/s1ayfVs.jpg","https://i.imgur.com/yBjgv5I.jpg",
-    "https://i.imgur.com/t8BU8qZ.jpg","https://i.imgur.com/OLaaoiz.jpg","https://i.imgur.com/mdXIKzr.jpg"
+    "https://i.imgur.com/s1ayfVs.jpg",
+    "https://i.imgur.com/yBjgv5I.jpg",
+    "https://i.imgur.com/t8BU8qZ.jpg",
+    "https://i.imgur.com/OLaaoiz.jpg",
+    "https://i.imgur.com/mdXIKzr.jpg"
   ],
   prices: [
     { group: "Chest-up / Avatar Type", items: [
@@ -285,187 +319,348 @@ setInterval(()=>{ currentTimeEl.textContent = new Date().toLocaleTimeString([], 
 
 /* Contact */
 document.getElementById('discTag').textContent = CONFIG.discordTag;
-document.getElementById('copyDiscord').onclick = async ()=>{ try{
-  await navigator.clipboard.writeText(CONFIG.discordTag); toast("Copied!"); }catch{ toast(CONFIG.discordTag); } };
+document.getElementById('copyDiscord').onclick = async ()=>{ try{ await navigator.clipboard.writeText(CONFIG.discordTag); toast("Copied!"); }catch{ toast(CONFIG.discordTag); } };
 
 /* =================== SLOTS (Netlify) =================== */
 const SLOT_API = '/.netlify/functions/slots';
-function normalizeFree(v){ if(v===true) return true; if(v===false) return false;
-  if(typeof v==='number') return v===1;
-  if(typeof v==='string'){ const s=v.trim().toLowerCase(); return (s==='true'||s==='1'||s==='free'); }
-  return false; }
-async function getSlots(){ const r=await fetch(SLOT_API,{method:'GET',cache:'no-store'}); const d=await r.json(); return Array.isArray(d.slots)?d.slots:[true,true,true,true]; }
-async function setSlot(slotIndex, reserve){ const r=await fetch(SLOT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slotIndex,reserve})}); return r.json(); }
-
-async function buildSlots(){
-  const grid=document.getElementById('slotGrid'); const sum=document.getElementById('slotSummary'); grid.innerHTML='';
-  let slots; try{ slots=await getSlots(); }catch(e){ slots=[false,false,false,false]; }
-  let freeCount=0;
-  slots.forEach((val,i)=>{ const isFree=normalizeFree(val); if(isFree) freeCount++;
-    const d=document.createElement('div'); d.className='slot '+(isFree?'free':'taken'); d.textContent=`Slot ${i+1}`;
-    d.style.background=isFree?CONFIG.commissions.freeColor:CONFIG.commissions.takenColor;
-    d.style.borderColor=isFree?'transparent':'rgba(255,255,255,.12)';
-    d.addEventListener('click',()=>openPopup(isFree?'✅ This slot is free to take!':'❌ This slot is currently unavailable'));
-    grid.appendChild(d);
+function normalizeFree(v){
+  if (v === true) return true;
+  if (v === false) return false;
+  if (typeof v === 'number') return v === 1;
+  if (typeof v === 'string'){ const s=v.trim().toLowerCase(); return (s==='true'||s==='1'||s==='free'); }
+  return false;
+}
+async function getSlots() {
+  const r = await fetch(SLOT_API, { method: 'GET', cache: 'no-store' });
+  const data = await r.json();
+  return Array.isArray(data.slots) ? data.slots : [true, true, true, true];
+}
+async function setSlot(slotIndex, reserve) {
+  const r = await fetch(SLOT_API, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ slot: slotIndex, reserve })
   });
-  sum.textContent=`${freeCount}/${slots.length} free`;
-  const anyFree=freeCount>0;
-  document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn=>{
-    if(!btn.dataset.baseText) btn.dataset.baseText=btn.textContent;
-    btn.disabled=!anyFree; btn.style.opacity=anyFree?'1':'.55'; btn.style.pointerEvents=anyFree?'auto':'none';
-    btn.textContent=anyFree?btn.dataset.baseText:'No slots available'; btn.setAttribute('aria-disabled',String(!anyFree));
+  return r.json();
+}
+
+async function buildSlots() {
+  const grid = document.getElementById('slotGrid');
+  const sum = document.getElementById('slotSummary');
+  grid.innerHTML = '';
+
+  let slots;
+  try { slots = await getSlots(); } catch(e){ slots = [false,false,false,false]; }
+
+  const freeColor  = CONFIG.commissions.freeColor;
+  const takenColor = CONFIG.commissions.takenColor;
+
+  let freeCount = 0;
+  slots.forEach((val, i) => {
+    const isFree = normalizeFree(val);
+    if (isFree) freeCount++;
+
+    const div = document.createElement('div');
+    div.className = 'slot ' + (isFree ? 'free' : 'taken');
+    div.textContent = `Slot ${i + 1}`;
+    div.style.background = isFree ? freeColor : takenColor;
+    div.style.borderColor = isFree ? 'transparent' : 'rgba(255,255,255,.12)';
+    div.addEventListener('click', () => openPopup(isFree ? '✅ This slot is free to take!' : '❌ This slot is currently unavailable'));
+    grid.appendChild(div);
+  });
+
+  sum.textContent = `${freeCount}/${slots.length} free`;
+
+  // Disable "Order" buttons if no free slots
+  const anyFree = freeCount > 0;
+  document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn => {
+    if (!btn.dataset.baseText) btn.dataset.baseText = btn.textContent;
+    btn.disabled = !anyFree;
+    btn.style.opacity = anyFree ? '1' : '.55';
+    btn.style.pointerEvents = anyFree ? 'auto' : 'none';
+    btn.textContent = anyFree ? btn.dataset.baseText : 'No slots available';
+    btn.setAttribute('aria-disabled', String(!anyFree));
   });
 }
 
 /* =================== PRICES + ORDER FLOW =================== */
-const pricesGrid=document.getElementById('pricesGrid');
+const pricesGrid = document.getElementById('pricesGrid');
 CONFIG.prices.forEach(group=>{
-  const card=document.createElement('div'); card.className='price-card reveal';
-  const itemsHtml=group.items.map(it=>`
+  const card = document.createElement('div');
+  card.className = 'price-card reveal';
+  const itemsHtml = group.items.map(it=>`
     <li style="display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid rgba(255,255,255,.06)">
-      <span class="muted">${it.label}</span><strong class="price">${it.price}</strong></li>`).join('');
-  card.innerHTML=`<h3 style="margin:0 0 8px">${group.group}</h3>
+      <span class="muted">${it.label}</span>
+      <strong class="price">${it.price}</strong>
+    </li>
+  `).join('');
+  card.innerHTML = `
+    <h3 style="margin:0 0 8px">${group.group}</h3>
     <ul style="list-style:none; padding:0; margin:0">${itemsHtml}</ul>
-    <button class="btn primary order-btn" data-group="${group.group}">Order ${group.group.split('/')[0].trim()}</button>`;
+    <button class="btn primary order-btn" data-group="${group.group}">Order ${group.group.split('/')[0].trim()}</button>
+  `;
   pricesGrid.appendChild(card);
 });
 
+/* Attach order button events (open modal form) */
 document.addEventListener('click', (e)=>{
-  const btn=e.target.closest('.order-btn'); if(!btn) return;
-  const group=CONFIG.prices.find(g=>g.group===btn.dataset.group); const item=group.items[0];
-  openOrderModal({ group:group.group, priceLabel:item.price, amountEUR:item.amountEUR||parseInt(item.price) });
+  const btn = e.target.closest('.order-btn');
+  if(!btn) return;
+
+  // Use the first item as base (cheapest in that group)
+  const group = CONFIG.prices.find(g => g.group === btn.dataset.group);
+  const item  = group.items[0];
+  openOrderModal({
+    group: group.group,
+    priceLabel: item.price,
+    amountEUR: item.amountEUR || parseInt(item.price),
+  });
 });
 
 /* Order modal + PayPal */
-const orderOverlay=document.getElementById('orderOverlay');
-const orderPopup=document.getElementById('orderPopup');
-const orderCancelBtn=document.getElementById('orderCancel');
-const orderNextBtn=document.getElementById('orderNext');
-const paypalWrap=document.getElementById('paypalContainer');
-const orderMsg=document.getElementById('orderMsg');
-const orderEmail=document.getElementById('orderEmail');
-const orderDesc=document.getElementById('orderDesc');
-const orderFiles=document.getElementById('orderFiles');
-const orderPkg=document.getElementById('orderPackage');
-const orderPrice=document.getElementById('orderPrice');
-const orderSlotIndex=document.getElementById('orderSlotIndex');
-const orderExtras=document.getElementById('orderExtras');
-const orderTotalEl=document.getElementById('orderTotal');
-const orderTotalEUR=document.getElementById('orderTotalEUR');
-const extrasCountEl=document.getElementById('extrasCount');
-const extrasMinusBtn=document.getElementById('extrasMinus');
-const extrasPlusBtn=document.getElementById('extrasPlus');
+const orderOverlay   = document.getElementById('orderOverlay');
+const orderPopup     = document.getElementById('orderPopup');
+const orderCancelBtn = document.getElementById('orderCancel');
+const orderNextBtn   = document.getElementById('orderNext');
+const paypalWrap     = document.getElementById('paypalContainer');
+const orderMsg       = document.getElementById('orderMsg');
+const orderEmail     = document.getElementById('orderEmail');
+const orderDesc      = document.getElementById('orderDesc');
+const orderFiles     = document.getElementById('orderFiles');
+const orderPkg       = document.getElementById('orderPackage');
+const orderPrice     = document.getElementById('orderPrice');
+const orderSlotIndex = document.getElementById('orderSlotIndex');
 
-let pendingOrder=null;
+const extrasMinusBtn = document.getElementById('extrasMinus');
+const extrasPlusBtn  = document.getElementById('extrasPlus');
+const extrasCountEl  = document.getElementById('extrasCount');
+const orderExtras    = document.getElementById('orderExtras');
+const orderTotalEl   = document.getElementById('orderTotal');
+const orderTotalEUR  = document.getElementById('orderTotalEUR');
+
+let pendingOrder = null; // store info between steps
+
 function euro(n){ return `${Number(n).toFixed(0)}€`; }
 function recalcTotal(base){
-  const extras=parseInt(orderExtras.value||'0',10)||0;
-  const total=base+(extras*CONFIG.extras.pricePerExtraEUR);
-  orderTotalEUR.value=String(total); orderTotalEl.textContent=`Total: ${euro(total)}`;
-  if(pendingOrder) pendingOrder.totalEUR=total;
+  const extras = parseInt(orderExtras.value||'0',10)||0;
+  const total = base + (extras * CONFIG.extras.pricePerExtraEUR);
+  orderTotalEUR.value = String(total);
+  orderTotalEl.textContent = `Total: ${euro(total)}`;
+  if(pendingOrder) pendingOrder.totalEUR = total;
 }
-function setExtras(n, base){ const max=CONFIG.extras.maxExtras; n=Math.max(0,Math.min(max,n));
-  orderExtras.value=String(n); extrasCountEl.textContent=String(n); recalcTotal(base); }
-extrasMinusBtn.addEventListener('click',()=>{const base=pendingOrder?.baseEUR||0; setExtras((parseInt(orderExtras.value||'0',10)||0)-1,base);});
-extrasPlusBtn.addEventListener('click',()=>{const base=pendingOrder?.baseEUR||0; setExtras((parseInt(orderExtras.value||'0',10)||0)+1,base);});
+function setExtras(n, base){
+  const max = CONFIG.extras.maxExtras;
+  n = Math.max(0, Math.min(max, n));
+  orderExtras.value = String(n);
+  extrasCountEl.textContent = String(n);
+  recalcTotal(base);
+}
+extrasMinusBtn.addEventListener('click', ()=>{ const base=pendingOrder?.baseEUR||0; setExtras((parseInt(orderExtras.value||'0',10)||0)-1, base);});
+extrasPlusBtn.addEventListener('click', ()=>{ const base=pendingOrder?.baseEUR||0; setExtras((parseInt(orderExtras.value||'0',10)||0)+1, base);});
 
 function openOrderModal({group, priceLabel, amountEUR}){
-  orderPkg.value=group; orderPrice.value=priceLabel; orderMsg.textContent="";
-  paypalWrap.style.display='none'; orderNextBtn.style.display='inline-block';
-  orderOverlay.classList.add('open'); orderPopup.classList.add('open');
-  pendingOrder={ baseEUR:amountEUR, totalEUR:amountEUR }; setExtras(0, amountEUR);
+  orderPkg.value  = group;
+  orderPrice.value= priceLabel;
+  orderMsg.textContent = "";
+  paypalWrap.style.display = 'none';
+  orderNextBtn.style.display = 'inline-block';
+  orderOverlay.classList.add('open');
+  orderPopup.classList.add('open');
+  pendingOrder = { baseEUR: amountEUR, totalEUR: amountEUR };
+  setExtras(0, amountEUR);
 }
-function closeOrderModal(){ orderOverlay.classList.remove('open'); orderPopup.classList.remove('open'); pendingOrder=null; paypalWrap.innerHTML=''; }
+function closeOrderModal(){
+  orderOverlay.classList.remove('open');
+  orderPopup.classList.remove('open');
+  pendingOrder = null;
+  paypalWrap.innerHTML = '';
+}
 
+/* Proceed to PayPal: validate form first, then render PayPal buttons */
 orderNextBtn.addEventListener('click', async ()=>{
-  if(!orderEmail.value || !orderDesc.value){ orderMsg.textContent="Please fill your email and description first."; return; }
-  const slots=await getSlots(); const firstFree=slots.findIndex(s=>normalizeFree(s));
-  if(firstFree===-1){ orderMsg.textContent="No slots available right now."; return; }
-  orderSlotIndex.value=String(firstFree);
-  orderNextBtn.style.display='none'; paypalWrap.style.display='block';
-  orderMsg.textContent="Complete payment to reserve your slot.";
+  if(!orderEmail.value || !orderDesc.value){
+    orderMsg.textContent = "Please fill your email and description first.";
+    return;
+  }
+  // ensure there is a free slot before showing PayPal
+  const slots = await getSlots();
+  const firstFree = slots.findIndex(s=>normalizeFree(s));
+  if(firstFree === -1){
+    orderMsg.textContent = "No slots available right now.";
+    return;
+  }
+  orderSlotIndex.value = String(firstFree);
 
+  // lock UI into PayPal step
+  orderNextBtn.style.display = 'none';
+  paypalWrap.style.display = 'block';
+  orderMsg.textContent = "Complete payment to reserve your slot.";
+
+  // Render PayPal (LIVE SDK already loaded above)
   paypal.Buttons({
-    style:{ shape:'pill', layout:'vertical' },
-    createOrder:(data, actions)=>{
-      const extras=parseInt(orderExtras.value,10)||0;
-      const desc=`${orderPkg.value} — ${orderPrice.value}`+(extras>0?` (+${extras} extra)`:'');
-      const total=pendingOrder.totalEUR;
+    style: { shape:'pill', layout:'vertical' },
+    createOrder: (data, actions) => {
+      const extras = parseInt(orderExtras.value,10) || 0;
+      const desc = `${orderPkg.value} — ${orderPrice.value}` + (extras>0 ? ` (+${extras} extra)` : '');
+      const total = pendingOrder.totalEUR;
       return actions.order.create({
-        application_context:{ brand_name:"Raffu's Drawing Wall", user_action:"PAY_NOW", shipping_preference:"NO_SHIPPING" },
-        purchase_units:[{ amount:{ value:String(total.toFixed?total.toFixed(2):total), currency_code:'EUR' }, description:desc }]
+        application_context: {
+          brand_name: "Raffu's Drawing Wall",
+          user_action: "PAY_NOW",
+          shipping_preference: "NO_SHIPPING"
+        },
+        purchase_units: [{
+          amount: { value: String(Number(total).toFixed(2)), currency_code: 'EUR' },
+          description: desc
+        }]
       });
     },
-    onApprove: async (data, actions)=>{
-      const details=await actions.order.capture();
-      const idx=parseInt(orderSlotIndex.value,10);
-      try{ await setSlot(idx,true); }catch(e){}
+    onApprove: async (data, actions) => {
+      const details = await actions.order.capture();
+      // Reserve the slot
+      const idx = parseInt(orderSlotIndex.value, 10);
+      try{ await setSlot(idx, true); }catch(e){ /* ignore for now */ }
+
+      // Submit the form to Netlify Forms with files + PayPal data
       await submitNetlifyForm(details);
-      closeOrderModal(); openPopup('✅ Payment received! Your slot is reserved. I will contact you by email.'); buildSlots();
+
+      // close, refresh slots
+      closeOrderModal();
+      openPopup('✅ Payment received! Your slot is reserved. I will contact you by email.');
+      buildSlots();
     },
-    onError: ()=>{ orderMsg.textContent="PayPal error. Please try again."; },
-    onCancel: ()=>{ orderMsg.textContent="Payment cancelled."; }
+    onError: () => { orderMsg.textContent = "PayPal error. Please try again."; },
+    onCancel: () => { orderMsg.textContent = "Payment cancelled."; }
   }).render('#paypalContainer');
 });
 
-/* Netlify Forms submit */
+/* Submit to Netlify Forms (stores in Netlify > Forms) */
 async function submitNetlifyForm(paypalDetails){
-  const fd=new FormData();
-  fd.append('form-name','commission');
-  fd.append('email',orderEmail.value);
-  fd.append('description',orderDesc.value);
-  fd.append('package',orderPkg.value);
-  fd.append('price',orderPrice.value);
-  fd.append('slotIndex',orderSlotIndex.value);
-  fd.append('extras',orderExtras.value);
-  fd.append('total_eur',orderTotalEUR.value);
-  fd.append('paypal_order_id',paypalDetails.id||'');
-  fd.append('paypal_payer_email',paypalDetails?.payer?.email_address||'');
-  Array.from(orderFiles.files||[]).slice(0,5).forEach(f=>{ if(f.size<=5*1024*1024) fd.append('refs',f,f.name); });
-  await fetch('/',{ method:'POST', body:fd });
+  const fd = new FormData();
+  fd.append('form-name', 'commission');
+  fd.append('email', orderEmail.value);
+  fd.append('description', orderDesc.value);
+  fd.append('package', orderPkg.value);
+  fd.append('price', orderPrice.value);
+  fd.append('slotIndex', orderSlotIndex.value);
+  fd.append('extras', orderExtras.value);
+  fd.append('totalEUR', orderTotalEUR.value);
+  fd.append('paypal_order_id', paypalDetails.id || '');
+  fd.append('paypal_payer_email', paypalDetails?.payer?.email_address || '');
+  // files (cap 5)
+  Array.from(orderFiles.files || []).slice(0,5).forEach(f => fd.append('refs', f, f.name));
+
+  await fetch('/', { method:'POST', body:fd });
 }
+
+/* Cancel order */
 orderCancelBtn.addEventListener('click', closeOrderModal);
 
-/* GALLERY + LIGHTBOX */
-const grid=document.getElementById('instaGrid');
-CONFIG.galleryImages.forEach(src=>{ const card=document.createElement('div'); card.className='img-card reveal';
-  card.innerHTML=`<img alt="Artwork" src="${src}" loading="lazy" decoding="async">`; card.addEventListener('click',()=>openLightbox(src)); grid.appendChild(card); });
+/* =================== GALLERY + LIGHTBOX =================== */
+const grid = document.getElementById('instaGrid');
+CONFIG.galleryImages.forEach(src=>{
+  const card = document.createElement('div');
+  card.className = 'img-card reveal';
+  card.innerHTML = `<img alt="Artwork" src="${src}" loading="lazy" decoding="async">`;
+  card.addEventListener('click', ()=> openLightbox(src));
+  grid.appendChild(card);
+});
 
-const io=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} }); },{ threshold:.15 });
+/* Reveal on scroll */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} });
+},{ threshold:.15 });
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=> t.style.display='none', 1100); }
 
-/* Lightbox controls */
-const lb=document.getElementById('lightbox'); const lbImg=document.getElementById('lbImg'); const lbStage=document.getElementById('lbStage');
-const btnIn=document.getElementById('zoomIn'); const btnOut=document.getElementById('zoomOut'); const btnReset=document.getElementById('zoomReset'); const btnClose=document.getElementById('lbClose');
-let scale=1, tx=0, ty=0, dragging=false, sx=0, sy=0; const MIN_SCALE=1, MAX_SCALE=2.5;
-function openLightbox(src){ lbImg.onload=()=>{ resetZoom(); }; lbImg.src=src; lb.classList.add('open'); document.body.style.overflow='hidden'; }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=> t.style.display='none', 1100);
+}
+
+/* Lightbox with fit + zoom */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbStage = document.getElementById('lbStage');
+const btnIn = document.getElementById('zoomIn');
+const btnOut = document.getElementById('zoomOut');
+const btnReset = document.getElementById('zoomReset');
+const btnClose = document.getElementById('lbClose');
+
+let scale = 1, tx = 0, ty = 0, dragging = false, sx = 0, sy = 0;
+const MIN_SCALE = 1, MAX_SCALE = 2.5;
+
+function openLightbox(src){
+  lbImg.onload = ()=>{ resetZoom(); };
+  lbImg.src = src;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
 function closeLightbox(){ lb.classList.remove('open'); document.body.style.overflow=''; }
-function applyTransform(){ lbImg.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})`; }
-function resetZoom(){ scale=1; tx=0; ty=0; applyTransform(); }
-btnClose.onclick=closeLightbox; lb.addEventListener('click',(e)=>{ if(e.target===lb) closeLightbox(); });
-document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeLightbox(); });
-btnIn.onclick=()=> setScale(scale+0.25); btnOut.onclick=()=> setScale(scale-0.25); btnReset.onclick=resetZoom;
-function setScale(newScale,fx=null,fy=null){ newScale=Math.min(MAX_SCALE,Math.max(MIN_SCALE,newScale));
-  if(newScale!==scale){ if(fx!==null&&fy!==null){ const rect=lbStage.getBoundingClientRect(); const cx=fx-rect.left-rect.width/2; const cy=fy-rect.top-rect.height/2;
-    tx-=cx*(newScale/scale-1); ty-=cy*(newScale/scale-1); } scale=newScale; applyTransform(); } }
-lbStage.addEventListener('wheel',(e)=>{ e.preventDefault(); const d=Math.sign(e.deltaY)*-0.2; setScale(scale+d,e.clientX,e.clientY); },{passive:false});
-lbStage.addEventListener('mousedown',(e)=>{ dragging=true; lbImg.style.cursor='grabbing'; sx=e.clientX; sy=e.clientY; });
-window.addEventListener('mouseup',()=>{ dragging=false; lbImg.style.cursor='grab'; });
-window.addEventListener('mousemove',(e)=>{ if(!dragging) return; tx+=(e.clientX-sx); ty+=(e.clientY-sy); sx=e.clientX; sy=e.clientY; applyTransform(); });
-lbStage.addEventListener('dblclick',(e)=>{ if(scale===1) setScale(1.75,e.clientX,e.clientY); else resetZoom(); });
+function applyTransform(){ lbImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
+function resetZoom(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
+btnClose.onclick = closeLightbox;
+lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
+btnIn.onclick = ()=> setScale(scale + 0.25);
+btnOut.onclick = ()=> setScale(scale - 0.25);
+btnReset.onclick = resetZoom;
+
+function setScale(newScale, focusX=null, focusY=null){
+  newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+  if(newScale !== scale){
+    if (focusX !== null && focusY !== null){
+      const rect = lbStage.getBoundingClientRect();
+      const cx = focusX - rect.left - rect.width/2;
+      const cy = focusY - rect.top - rect.height/2;
+      tx -= cx * (newScale/scale - 1);
+      ty -= cy * (newScale/scale - 1);
+    }
+    scale = newScale; applyTransform();
+  }
+}
+lbStage.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const delta = Math.sign(e.deltaY) * -0.2;
+  setScale(scale + delta, e.clientX, e.clientY);
+},{passive:false});
+lbStage.addEventListener('mousedown', (e)=>{ dragging = true; lbImg.style.cursor='grabbing'; sx=e.clientX; sy=e.clientY; });
+window.addEventListener('mouseup', ()=>{ dragging=false; lbImg.style.cursor='grab'; });
+window.addEventListener('mousemove', (e)=>{
+  if(!dragging) return;
+  tx += (e.clientX - sx); ty += (e.clientY - sy);
+  sx = e.clientX; sy = e.clientY; applyTransform();
+});
+lbStage.addEventListener('dblclick', (e)=>{
+  if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
+});
 
 /* Simple info popup */
-const slotOverlay=document.getElementById('slotOverlay'); const slotPopup=document.getElementById('slotPopup'); const slotMsg=document.getElementById('slotPopupMsg'); const slotOk=document.getElementById('slotOk');
-function openPopup(message){ slotMsg.textContent=message; slotOverlay.classList.add('open'); slotPopup.classList.add('open'); }
-function closePopup(){ slotOverlay.classList.remove('open'); slotPopup.classList.remove('open'); }
-slotOverlay.addEventListener('click', closePopup); slotOk.addEventListener('click', closePopup);
+const slotOverlay = document.getElementById('slotOverlay');
+const slotPopup = document.getElementById('slotPopup');
+const slotMsg = document.getElementById('slotPopupMsg');
+const slotOk = document.getElementById('slotOk');
+function openPopup(message){
+  slotMsg.textContent = message;
+  slotOverlay.classList.add('open');
+  slotPopup.classList.add('open');
+}
+function closePopup(){
+  slotOverlay.classList.remove('open');
+  slotPopup.classList.remove('open');
+}
+slotOverlay.addEventListener('click', closePopup);
+slotOk.addEventListener('click', closePopup);
 
 /* Mobile nav toggle */
-const headerEl=document.getElementById('siteHeader'); const ham=document.getElementById('hamburger');
-ham.addEventListener('click',()=>{ headerEl.classList.toggle('open'); ham.setAttribute('aria-expanded', headerEl.classList.contains('open')); });
+const headerEl = document.getElementById('siteHeader');
+const ham = document.getElementById('hamburger');
+ham.addEventListener('click', ()=>{
+  headerEl.classList.toggle('open');
+  ham.setAttribute('aria-expanded', headerEl.classList.contains('open'));
+});
 
-/* Start */
+/* Kick things off */
 buildSlots();
 </script>
 </body>
