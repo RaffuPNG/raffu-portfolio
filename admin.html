@@ -52,134 +52,145 @@
 </div>
 
 <script>
-/* =========== ADMIN UI (robust) =========== */
-const ADMIN_FN = '/.netlify/functions/admin-slots';
+/* ===== ADMIN — loads Identity first, then boots app ===== */
+(function () {
+  const ADMIN_FN = '/.netlify/functions/admin-slots';
+  const WIDGET_URL = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
 
-const el = (id) => document.getElementById(id);
-const slotGrid = el('slotGrid');
-const app = el('app');
-const guard = el('guard');
-const loginBtn = el('loginBtn');
-const logoutBtn = el('logoutBtn');
-const refreshBtn = el('refreshBtn');
-const adminEmailEl = el('adminEmail');
+  // Basic DOM helpers
+  const $ = (id) => document.getElementById(id);
+  const slotGrid = $('slotGrid');
+  const app = $('app');
+  const guard = $('guard');
+  const loginBtn = $('loginBtn');
+  const logoutBtn = $('logoutBtn');
+  const refreshBtn = $('refreshBtn');
+  const adminEmailEl = $('adminEmail');
 
-function showApp(show){
-  app.classList.toggle('hidden', !show);
-  guard.classList.toggle('hidden', show);
-  loginBtn.classList.toggle('hidden', show);
-  logoutBtn.classList.toggle('hidden', !show);
-}
-function setGuard(msg){ guard.textContent = msg; }
-
-/* ---- helpers ---- */
-async function currentJWT(){
-  const user = netlifyIdentity.currentUser();
-  if(!user) return null;
-  try { return await user.jwt(); } catch { return null; }
-}
-async function api(path, opts={}){
-  const token = await currentJWT();
-  if(!token) throw new Error('No Identity session yet');
-  const headers = { 'Content-Type':'application/json', ...(opts.headers||{}), Authorization: 'Bearer ' + token };
-  const res = await fetch(ADMIN_FN + path, { ...opts, headers, cache:'no-store' });
-  if(!res.ok){
-    const txt = await res.text();
-    throw new Error(txt || ('HTTP '+res.status));
+  function showApp(show){
+    app.classList.toggle('hidden', !show);
+    guard.classList.toggle('hidden', show);
+    loginBtn.classList.toggle('hidden', show);
+    logoutBtn.classList.toggle('hidden', !show);
   }
-  return res.json();
-}
+  function setGuard(msg){ guard.textContent = msg; }
 
-function renderSlots(slots){
-  slotGrid.innerHTML = '';
-  slots.forEach((isFree, i)=>{
-    const card = document.createElement('div');
-    card.className = 'slot';
-    card.innerHTML = `
-      <h3>Slot ${i+1}</h3>
-      <div class="row">
-        <div class="muted">Status: ${isFree ? 'FREE' : 'TAKEN'}</div>
-        <div>
-          <button class="ok"  data-act="free" data-i="${i}">Free</button>
-          <button class="bad" data-act="take" data-i="${i}">Take</button>
-        </div>
-      </div>`;
-    slotGrid.appendChild(card);
-  });
-}
-async function loadSlots(){
-  const data = await api('?v=' + Date.now());
-  renderSlots(data.slots || []);
-}
+  // Load the Identity widget if it's not there
+  function ensureIdentity(cb){
+    if (window.netlifyIdentity) return cb();
+    const s = document.createElement('script');
+    s.src = WIDGET_URL;
+    s.onload = cb;
+    s.onerror = () => setGuard('Failed to load Netlify Identity. Disable ad-block/Shields and refresh.');
+    document.head.appendChild(s);
+  }
 
-/* ---- events ---- */
-slotGrid.addEventListener('click', async (e)=>{
-  const btn = e.target.closest('button[data-act]');
-  if(!btn) return;
-  const i = parseInt(btn.dataset.i,10);
-  const free = btn.dataset.act === 'free';
-  try{
-    await api('', { method:'POST', body: JSON.stringify({ slot:i, free }) });
-    await loadSlots();
-  }catch(err){ alert('Save error: ' + err.message); }
-});
-refreshBtn.addEventListener('click', loadSlots);
-loginBtn.addEventListener('click', ()=> netlifyIdentity.open('login'));
-logoutBtn.addEventListener('click', ()=> netlifyIdentity.logout());
-
-/* ---- super-robust session detection ----
-   1) react to identity events
-   2) poll for up to 30s (covers browsers where currentUser appears late)
--------------------------------------------------- */
-async function tryRender(){
-  const u = netlifyIdentity.currentUser();
-  if(!u){ setGuard('Please log in to manage slots.'); showApp(false); return; }
-  adminEmailEl.textContent = 'Signed in as: ' + (u.email || '');
-  showApp(true);
-  await loadSlots();
-}
-
-function startPoll(){
-  let tries = 0;
-  const timer = setInterval(async ()=>{
-    tries++;
-    const u = netlifyIdentity.currentUser && netlifyIdentity.currentUser();
-    if (u){
-      clearInterval(timer);
-      try { await tryRender(); } catch (e){ alert('Load error: ' + e.message); }
-    } else if (tries > 60){ // ~30s
-      clearInterval(timer);
-      setGuard('Please log in to manage slots.');
-      showApp(false);
+  // API helpers (runs only after widget is ready)
+  async function currentJWT(){
+    const user = window.netlifyIdentity.currentUser();
+    if(!user) return null;
+    try { return await user.jwt(); } catch { return null; }
+  }
+  async function api(path, opts={}){
+    const token = await currentJWT();
+    if(!token) throw new Error('No Identity session yet');
+    const headers = { 'Content-Type':'application/json', ...(opts.headers||{}), Authorization:'Bearer '+token };
+    const res = await fetch(ADMIN_FN + path, { ...opts, headers, cache:'no-store' });
+    if(!res.ok){
+      const txt = await res.text();
+      throw new Error(txt || ('HTTP '+res.status));
     }
-  }, 500);
-}
+    return res.json();
+  }
 
-/* attach listeners BEFORE init */
-netlifyIdentity.on('init', async () => {
-  const u = netlifyIdentity.currentUser && netlifyIdentity.currentUser();
-  if (u) { try { await tryRender(); } catch(e){ alert('Load error: ' + e.message); } }
-  else { setGuard('Loading…'); startPoll(); }
-});
-netlifyIdentity.on('login', async (user)=>{
-  netlifyIdentity.close();
-  adminEmailEl.textContent = 'Signed in as: ' + (user?.email || '');
-  showApp(true);
-  try { await loadSlots(); } catch(e){ alert('Load error: ' + e.message); }
-});
-netlifyIdentity.on('logout', ()=>{
-  adminEmailEl.textContent = '';
-  showApp(false);
-  setGuard('Please log in to manage slots.');
-});
+  function renderSlots(slots){
+    slotGrid.innerHTML = '';
+    slots.forEach((isFree, i)=>{
+      const card = document.createElement('div');
+      card.className = 'slot';
+      card.innerHTML = `
+        <h3>Slot ${i+1}</h3>
+        <div class="row">
+          <div class="muted">Status: ${isFree ? 'FREE' : 'TAKEN'}</div>
+          <div>
+            <button class="ok"  data-act="free" data-i="${i}">Free</button>
+            <button class="bad" data-act="take" data-i="${i}">Take</button>
+          </div>
+        </div>`;
+      slotGrid.appendChild(card);
+    });
+  }
 
-netlifyIdentity.init();
+  async function loadSlots(){
+    const data = await api('?v=' + Date.now());
+    renderSlots(data.slots || []);
+  }
 
-/* fallback if the init event fires too early */
-setTimeout(()=> {
-  const u = netlifyIdentity.currentUser && netlifyIdentity.currentUser();
-  if (!u) startPoll();
-}, 300);
+  // UI events
+  slotGrid.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    const i = parseInt(btn.dataset.i,10);
+    const free = btn.dataset.act === 'free';
+    try{
+      await api('', { method:'POST', body: JSON.stringify({ slot:i, free }) });
+      await loadSlots();
+    }catch(err){ alert('Save error: ' + err.message); }
+  });
+  refreshBtn.addEventListener('click', loadSlots);
+  loginBtn.addEventListener('click', ()=> window.netlifyIdentity.open('login'));
+  logoutBtn.addEventListener('click', ()=> window.netlifyIdentity.logout());
+
+  // Boot the app once the widget is ready
+  function boot(){
+    const id = window.netlifyIdentity;
+    if (!id) return; // safety
+    // React to events
+    id.on('init', async ()=>{
+      const u = id.currentUser();
+      if (u){
+        adminEmailEl.textContent = 'Signed in as: ' + (u.email || '');
+        showApp(true);
+        try { await loadSlots(); } catch(e){ setGuard('Load error: ' + e.message); }
+      } else {
+        showApp(false);
+        setGuard('Please log in to manage slots.');
+      }
+    });
+    id.on('login', async (user)=>{
+      id.close();
+      adminEmailEl.textContent = 'Signed in as: ' + (user?.email || '');
+      showApp(true);
+      try { await loadSlots(); } catch(e){ alert('Load error: ' + e.message); }
+    });
+    id.on('logout', ()=>{
+      adminEmailEl.textContent = '';
+      showApp(false);
+      setGuard('Please log in to manage slots.');
+    });
+
+    // Start Identity and add a small poll as fallback
+    id.init();
+    let tries = 0;
+    const poll = setInterval(async ()=>{
+      tries++;
+      const u = id.currentUser && id.currentUser();
+      if (u){
+        clearInterval(poll);
+        adminEmailEl.textContent = 'Signed in as: ' + (u.email || '');
+        showApp(true);
+        try { await loadSlots(); } catch(e){ alert('Load error: ' + e.message); }
+      } else if (tries > 60){
+        clearInterval(poll);
+        setGuard('Please log in to manage slots.');
+      }
+    }, 500);
+  }
+
+  // Start after DOM is ready and widget is loaded
+  const ready = (fn)=> document.readyState !== 'loading' ? fn() : document.addEventListener('DOMContentLoaded', fn);
+  ready(()=> ensureIdentity(boot));
+})();
 </script>
 </body>
 </html>
