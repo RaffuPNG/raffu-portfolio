@@ -12,8 +12,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-<!-- PayPal SDK (replace YOUR_PAYPAL_CLIENT_ID) -->
-<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR"></script>
+<!-- PayPal SDK (SANDBOX) -->
+<script src="https://www.paypal.com/sdk/js?client-id=ATCdObi8scd_AYR9hvXAmNNOXE7wYEd86hZi-KzK_6J38EsYFS_7jfNhCpirvxz2qCQS6E3vzNNlYL1U&currency=EUR&intent=capture"></script>
 
 <style>
   :root{
@@ -222,7 +222,7 @@
     <div class="panel p24 reveal" style="margin-bottom:12px">
       <p class="muted" style="margin:0">
         • No scene backgrounds — solid color or transparent PNG.<br/>
-        • Extra character: <span class="accent">+15€</span>.
+        • Extra character: <span class="accent">+15€</span> (up to 5).
       </p>
     </div>
     <div class="grid prices" id="pricesGrid"></div>
@@ -286,9 +286,25 @@
       <input type="file" name="refs" id="orderFiles" accept="image/png,image/jpeg" multiple />
     </div>
 
+    <!-- Extra characters control -->
+    <div class="field">
+      <label>Extra characters <span class="muted">(+15€ each, max 5)</span></label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" id="extrasMinus" class="pop-btn pop-ok" style="min-width:44px" aria-label="Minus extra">−</button>
+        <strong id="extrasCount" aria-live="polite">0</strong>
+        <button type="button" id="extrasPlus" class="pop-btn pop-ok" style="min-width:44px" aria-label="Plus extra">+</button>
+      </div>
+    </div>
+
+    <!-- Live total -->
+    <div id="orderTotal" class="muted" style="margin-top:6px; font-weight:800">Total: —</div>
+
+    <!-- Hidden fields submitted to Netlify Forms -->
     <input type="hidden" name="package" id="orderPackage" />
     <input type="hidden" name="price" id="orderPrice" />
     <input type="hidden" name="slotIndex" id="orderSlotIndex" />
+    <input type="hidden" name="extras" id="orderExtras" value="0" />
+    <input type="hidden" name="totalEUR" id="orderTotalEUR" value="0" />
 
     <div class="pop-actions">
       <button type="button" class="pop-btn pop-ok" id="orderCancel">Cancel</button>
@@ -307,6 +323,8 @@
   <input type="text" name="package" />
   <input type="text" name="price" />
   <input type="text" name="slotIndex" />
+  <input type="text" name="extras" />
+  <input type="text" name="totalEUR" />
   <input type="file" name="refs" multiple />
 </form>
 
@@ -323,6 +341,10 @@ const CONFIG = {
     maxSlots: 4,
     freeColor: "#ff6a00",
     takenColor: "#0b0b0f"
+  },
+  extras: {
+    pricePerExtraEUR: 15,
+    maxExtras: 5
   },
   galleryImages: [
     "https://i.imgur.com/s1ayfVs.jpg",
@@ -436,7 +458,7 @@ const pricesGrid = document.getElementById('pricesGrid');
 CONFIG.prices.forEach(group=>{
   const card = document.createElement('div');
   card.className = 'price-card reveal';
-  const itemsHtml = group.items.map((it, idx)=>`
+  const itemsHtml = group.items.map((it)=>`
     <li style="display:flex; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid rgba(255,255,255,.06)">
       <span class="muted">${it.label}</span>
       <strong class="price">${it.price}</strong>
@@ -480,17 +502,55 @@ const orderPkg       = document.getElementById('orderPackage');
 const orderPrice     = document.getElementById('orderPrice');
 const orderSlotIndex = document.getElementById('orderSlotIndex');
 
+// Extras + totals
+const orderExtras    = document.getElementById('orderExtras');
+const orderTotalEl   = document.getElementById('orderTotal');
+const orderTotalEUR  = document.getElementById('orderTotalEUR');
+const extrasCountEl  = document.getElementById('extrasCount');
+const extrasMinusBtn = document.getElementById('extrasMinus');
+const extrasPlusBtn  = document.getElementById('extrasPlus');
+
 let pendingOrder = null; // store info between steps
 
+function euro(n){ return `${Number(n).toFixed(0)}€`; }
+
+function recalcTotal(baseEUR){
+  const extras = parseInt(orderExtras.value || '0', 10) || 0;
+  const total = baseEUR + (extras * CONFIG.extras.pricePerExtraEUR);
+  orderTotalEUR.value = String(total);
+  orderTotalEl.textContent = `Total: ${euro(total)}`;
+  if (pendingOrder) pendingOrder.totalEUR = total;
+}
+
+function setExtras(n, baseEUR){
+  const max = CONFIG.extras.maxExtras;
+  n = Math.max(0, Math.min(max, n));
+  orderExtras.value = String(n);
+  extrasCountEl.textContent = String(n);
+  recalcTotal(baseEUR);
+}
+
+extrasMinusBtn.addEventListener('click', ()=>{
+  const base = pendingOrder?.baseEUR || 0;
+  setExtras((parseInt(orderExtras.value||'0',10)||0) - 1, base);
+});
+extrasPlusBtn.addEventListener('click', ()=>{
+  const base = pendingOrder?.baseEUR || 0;
+  setExtras((parseInt(orderExtras.value||'0',10)||0) + 1, base);
+});
+
 function openOrderModal({group, priceLabel, amountEUR}){
-  orderPkg.value  = group;
-  orderPrice.value= priceLabel;
+  orderPkg.value   = group;
+  orderPrice.value = priceLabel;
   orderMsg.textContent = "";
   paypalWrap.style.display = 'none';
   orderNextBtn.style.display = 'inline-block';
   orderOverlay.classList.add('open');
   orderPopup.classList.add('open');
-  pendingOrder = { amountEUR };
+
+  // base & extras reset
+  pendingOrder = { baseEUR: amountEUR, totalEUR: amountEUR };
+  setExtras(0, amountEUR); // initializes count, hidden field, and total
 }
 function closeOrderModal(){
   orderOverlay.classList.remove('open');
@@ -520,14 +580,17 @@ orderNextBtn.addEventListener('click', async ()=>{
   paypalWrap.style.display = 'block';
   orderMsg.textContent = "Complete payment to reserve your slot.";
 
-  // Render PayPal
+  // Render PayPal with dynamic total
   paypal.Buttons({
     style: { shape:'pill', layout:'vertical' },
     createOrder: (data, actions) => {
+      const extras = parseInt(orderExtras.value,10) || 0;
+      const desc = `${orderPkg.value} — ${orderPrice.value}` + (extras>0 ? ` (+${extras} extra)` : '');
+      const total = pendingOrder.totalEUR;
       return actions.order.create({
         purchase_units: [{
-          amount: { value: String(pendingOrder.amountEUR), currency_code: 'EUR' },
-          description: `${orderPkg.value} — ${orderPrice.value}`
+          amount: { value: String(total.toFixed ? total.toFixed(2) : total), currency_code: 'EUR' },
+          description: desc
         }]
       });
     },
@@ -565,10 +628,14 @@ async function submitNetlifyForm(paypalDetails){
   fd.append('package', orderPkg.value);
   fd.append('price', orderPrice.value);
   fd.append('slotIndex', orderSlotIndex.value);
+  fd.append('extras', orderExtras.value);
+  fd.append('total_eur', orderTotalEUR.value);
   fd.append('paypal_order_id', paypalDetails.id || '');
   fd.append('paypal_payer_email', paypalDetails?.payer?.email_address || '');
-  // files
-  Array.from(orderFiles.files || []).slice(0,5).forEach(f => fd.append('refs', f, f.name));
+  // files (max 5, 5MB each)
+  Array.from(orderFiles.files || []).slice(0,5).forEach(f => {
+    if (f.size <= 5*1024*1024) fd.append('refs', f, f.name);
+  });
 
   await fetch('/', { method:'POST', body:fd });
 }
@@ -685,4 +752,3 @@ buildSlots();
 </script>
 </body>
 </html>
-
