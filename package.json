@@ -1,9 +1,8 @@
 {
-  "name": "raffu-portfolio",
+  "name": "raffu-commissions",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@netlify/blobs": "^7.0.0",
-    "@netlify/functions": "^2.6.0"
+    "@netlify/blobs": "^5.0.0"
   }
 }
