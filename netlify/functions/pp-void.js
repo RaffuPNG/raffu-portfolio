@@ -13,6 +13,29 @@ const base = {
 const json = (status, data) =>
   new Response(JSON.stringify(data), { status, headers: base });
 
+/* auth helpers */
+function tokenFromRequest(request) {
+  const auth = request.headers.get('authorization') || '';
+  if (auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
+  const cookie = request.headers.get('cookie') || '';
+  const m = cookie.match(/(?:^|;\s*)nf_jwt=([^;]+)/);
+  return m ? m[1] : null;
+}
+async function verifyUser(request) {
+  const token = tokenFromRequest(request);
+  if (!token) return null;
+  const site = process.env.URL || process.env.DEPLOY_PRIME_URL || new URL(request.url).origin;
+  const r = await fetch(`${site}/.netlify/identity/user`, { headers: { Authorization: `Bearer ${token}` }});
+  if (!r.ok) return null;
+  return r.json();
+}
+function requireAdminEmail(user) {
+  const admin = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+  if (!admin) return !!user;
+  return user && user.email && user.email.toLowerCase() === admin;
+}
+/* -------------- */
+
 async function token() {
   const id = process.env.PAYPAL_CLIENT_ID;
   const sec = process.env.PAYPAL_SECRET;
@@ -27,16 +50,17 @@ async function token() {
   return j.access_token;
 }
 
-export default async (request, context) => {
+export default async (request) => {
   if (request.method === 'OPTIONS') return new Response('', { status: 204, headers: base });
-  if (!context?.clientContext?.user) return json(401, { error: 'auth required' });
 
   try {
+    const user = await verifyUser(request);
+    if (!requireAdminEmail(user)) return json(401, { error: 'auth required' });
+
     const ordersStore = getStore({ name: 'commission-orders' });
     const slotsStore  = getStore({ name: 'commission-slots' });
 
-    let body = {};
-    try { body = await request.json(); } catch { body = {}; }
+    let body = {}; try { body = await request.json(); } catch {}
     const { id } = body;
 
     const orders = (await ordersStore.get(KEY_ORDERS, { type: 'json', consistency: 'strong' })) || [];
@@ -50,14 +74,13 @@ export default async (request, context) => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${tk}` }
     });
-
     if (!r.ok) {
       let j = {}; try { j = await r.json(); } catch {}
       throw new Error(j?.message || 'void failed');
     }
 
-    // free slot back
-    const slots = (await slotsStore.get(KEY_SLOTS, { type: 'json', consistency: 'strong' })) || [true, true, true, true];
+    // free slot
+    const slots = (await slotsStore.get(KEY_SLOTS, { type: 'json', consistency: 'strong' })) || [true,true,true,true];
     if (typeof o.slotIndex === 'number') slots[o.slotIndex] = true;
     await slotsStore.setJSON(KEY_SLOTS, slots);
 
