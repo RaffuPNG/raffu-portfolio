@@ -1,5 +1,6 @@
 import { getStore } from '@netlify/blobs';
 
+/* ---------- helpers ---------- */
 const KEY = 'orders';
 
 const base = {
@@ -11,33 +12,58 @@ const base = {
 const json = (status, data) =>
   new Response(JSON.stringify(data), { status, headers: base });
 
-export default async (request, context) => {
-  if (request.method === 'OPTIONS') return new Response('', { status: 204, headers: base });
+function tokenFromRequest(request) {
+  const auth = request.headers.get('authorization') || '';
+  if (auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
+  const cookie = request.headers.get('cookie') || '';
+  const m = cookie.match(/(?:^|;\s*)nf_jwt=([^;]+)/);
+  return m ? m[1] : null;
+}
 
-  const isAuthed = !!context?.clientContext?.user;
+async function verifyUser(request) {
+  const token = tokenFromRequest(request);
+  if (!token) return null;
+
+  const site =
+    process.env.URL ||
+    process.env.DEPLOY_PRIME_URL ||
+    new URL(request.url).origin;
+
+  const r = await fetch(`${site}/.netlify/identity/user`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) return null;
+  return r.json(); // { email, app_metadata, ... }
+}
+
+function requireAdminEmail(user) {
+  const admin = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+  if (!admin) return !!user;
+  return user && user.email && user.email.toLowerCase() === admin;
+}
+/* -------------------------------- */
+
+export default async (request) => {
+  if (request.method === 'OPTIONS') return new Response('', { status: 204, headers: base });
 
   try {
     const store = getStore({ name: 'commission-orders' });
+
+    // read & write helpers
     const read = async () => (await store.get(KEY, { type: 'json', consistency: 'strong' })) || [];
     const write = async (v) => { await store.setJSON(KEY, v); };
 
-    if (request.method === 'GET') {
-      if (!isAuthed) return json(401, { error: 'auth required' });
-      const orders = await read();
-      return json(200, { orders });
-    }
-
+    // public: create (called from the website after authorization)
     if (request.method === 'POST') {
       let body = {};
-      try { body = await request.json(); } catch { body = {}; }
-
+      try { body = await request.json(); } catch {}
       const orders = await read();
       const id = 'ord_' + Math.random().toString(36).slice(2, 9);
 
       orders.unshift({
         id,
         createdAt: Date.now(),
-        status: body.status || 'authorized',
+        status: body.status || 'authorized', // pending authorization
         slotIndex: body.slotIndex,
         email: body.email,
         description: body.description,
@@ -49,15 +75,22 @@ export default async (request, context) => {
         paypalAuthId: body.paypalAuthId || '',
         payerEmail: body.payerEmail || ''
       });
-
       await write(orders);
       return json(200, { ok: true, id });
     }
 
+    // protected: list & update
+    const user = await verifyUser(request);
+    if (!requireAdminEmail(user)) return json(401, { error: 'auth required' });
+
+    if (request.method === 'GET') {
+      const orders = await read();
+      return json(200, { orders });
+    }
+
     if (request.method === 'PUT') {
-      if (!isAuthed) return json(401, { error: 'auth required' });
       let body = {};
-      try { body = await request.json(); } catch { body = {}; }
+      try { body = await request.json(); } catch {}
       const { id, status } = body;
 
       const orders = await read();
