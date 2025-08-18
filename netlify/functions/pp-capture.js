@@ -12,6 +12,29 @@ const base = {
 const json = (status, data) =>
   new Response(JSON.stringify(data), { status, headers: base });
 
+/* auth helpers (same pattern as orders.js) */
+function tokenFromRequest(request) {
+  const auth = request.headers.get('authorization') || '';
+  if (auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
+  const cookie = request.headers.get('cookie') || '';
+  const m = cookie.match(/(?:^|;\s*)nf_jwt=([^;]+)/);
+  return m ? m[1] : null;
+}
+async function verifyUser(request) {
+  const token = tokenFromRequest(request);
+  if (!token) return null;
+  const site = process.env.URL || process.env.DEPLOY_PRIME_URL || new URL(request.url).origin;
+  const r = await fetch(`${site}/.netlify/identity/user`, { headers: { Authorization: `Bearer ${token}` }});
+  if (!r.ok) return null;
+  return r.json();
+}
+function requireAdminEmail(user) {
+  const admin = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+  if (!admin) return !!user;
+  return user && user.email && user.email.toLowerCase() === admin;
+}
+/* ----------------------------------------- */
+
 async function token() {
   const id = process.env.PAYPAL_CLIENT_ID;
   const sec = process.env.PAYPAL_SECRET;
@@ -26,14 +49,15 @@ async function token() {
   return j.access_token;
 }
 
-export default async (request, context) => {
+export default async (request) => {
   if (request.method === 'OPTIONS') return new Response('', { status: 204, headers: base });
-  if (!context?.clientContext?.user) return json(401, { error: 'auth required' });
 
   try {
+    const user = await verifyUser(request);
+    if (!requireAdminEmail(user)) return json(401, { error: 'auth required' });
+
     const store = getStore({ name: 'commission-orders' });
-    let body = {};
-    try { body = await request.json(); } catch { body = {}; }
+    let body = {}; try { body = await request.json(); } catch {}
     const { id } = body;
 
     const orders = (await store.get(KEY, { type: 'json', consistency: 'strong' })) || [];
