@@ -1,136 +1,266 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Dashboard — Slots & Orders</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Dashboard — Slots</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
-  :root{ --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --radius:14px; }
-  body{margin:0; background:#0b0b0f; color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  .wrap{max-width:980px; margin:0 auto; padding:20px}
-  .panel{background:linear-gradient(180deg,#141419,#0f0f14); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:16px; margin:12px 0}
-  h1{margin:8px 0 4px} h2{margin:0 0 10px}
-  .btn{border:none; padding:8px 12px; border-radius:10px; cursor:pointer}
-  .btn.primary{background:var(--accent); color:#0b0b0f; font-weight:800}
+  :root{
+    --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ok:#19c37d; --err:#ff4d4d;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:linear-gradient(180deg,#0b0b0f 0%, #0c0c12 100%); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  .wrap{max-width:1100px; margin:0 auto; padding:20px}
+  h1{margin:8px 0 14px}
   .muted{color:var(--muted)}
-  .slot{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.1); margin-right:8px; margin-bottom:8px; cursor:pointer}
-  .slot.free{background:#ff6a00; color:#0b0b0f} .slot.taken{background:#0b0b0f; color:#eaeaf1}
+  .panel{background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:16px; margin:12px 0}
+  .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+  .btn{border:none; background:#2a2b32; color:#fff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700}
+  .btn:hover{background:#343541}
+  .btn.primary{background:var(--accent); color:#0b0b0f}
+  .btn.ok{background:var(--ok); color:#04130b}
+  .btn.err{background:var(--err); color:#160606}
+  .slot{padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); cursor:pointer; font-weight:700}
+  .slot.free{background:var(--ok); color:#04130b}
+  .slot.taken{background:#20212a; color:#eaeaf1}
+  .grid{display:grid; gap:10px}
+  .orders{display:grid; gap:10px}
+  .card{padding:12px; border-radius:12px; background:#0f1016; border:1px solid rgba(255,255,255,.06)}
+  .card h4{margin:0 0 6px}
+  .pill{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800}
+  .pill.pending{background:#3a2b12; color:#ffbf66}
+  .pill.captured{background:#123a2a; color:#74ffc9}
+  .pill.voided{background:#3a1212; color:#ffa3a3}
+  .small{font-size:13px}
+  .right{margin-left:auto}
+  .headline{display:flex; align-items:center; gap:8px}
+  .footer-note{font-size:12px; color:var(--muted); margin-top:10px}
+  .errbox{background:#2a1414; border:1px solid #542222; color:#ffb3b3; padding:8px 10px; border-radius:10px; display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Admin Dashboard — Slots</h1>
-  <div class="muted" id="authState">Please log in to manage.</div>
-  <div style="margin:8px 0">
-    <button class="btn" id="loginBtn">Log in</button>
-    <button class="btn" id="logoutBtn" style="display:none">Log out</button>
+  <div class="headline">
+    <h1>Admin Dashboard — Slots</h1>
+    <span class="right muted small">Logged in as <strong id="whoami">Not logged in</strong></span>
+  </div>
+  <div class="row" style="margin-bottom:10px">
+    <button id="loginBtn" class="btn">Log in</button>
+    <button id="logoutBtn" class="btn">Log out</button>
+    <button id="refreshBtn" class="btn">Refresh</button>
+    <span class="muted small">If Brave/Ad-blocker is on, disable shields for this site.</span>
   </div>
 
-  <section class="panel">
-    <h2>Commission Slots</h2>
-    <div id="slotsWrap" class="muted">Loading…</div>
-  </section>
+  <div class="panel">
+    <div class="headline" style="margin-bottom:8px">
+      <h2 style="margin:0">Commission Slots</h2>
+      <span id="slotsSummary" class="muted small right">Loading…</span>
+    </div>
+    <div id="slotsRow" class="row"></div>
+    <div id="slotsStatus" class="footer-note">Loading slots…</div>
+  </div>
 
-  <section class="panel">
-    <h2>Pending Authorizations</h2>
-    <div id="ordersWrap" class="muted">Loading…</div>
-  </section>
+  <div class="panel">
+    <div class="headline" style="margin-bottom:8px">
+      <h2 style="margin:0">Pending Authorizations</h2>
+      <span id="ordersSummary" class="muted small right">Loading…</span>
+    </div>
+    <div id="ordersList" class="orders"></div>
+    <div id="ordersStatus" class="footer-note">Loading…</div>
+  </div>
+
+  <div id="errBox" class="errbox"></div>
 </div>
 
+<!-- Netlify Identity -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
-const SLOT_API='/.netlify/functions/slots';
-const ORDERS_API='/.netlify/functions/orders';
-const CAPTURE_API='/.netlify/functions/pp-capture';
-const VOID_API='/.netlify/functions/pp-void';
+/* ================== Helpers ================== */
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => new Intl.NumberFormat('en-US', { style:'currency', currency:'EUR' }).format(n);
+const time = (ms) => new Date(ms).toLocaleString([], { hour:'2-digit', minute:'2-digit', year:'numeric', month:'short', day:'2-digit' });
 
-const authState=document.getElementById('authState');
-const loginBtn=document.getElementById('loginBtn'), logoutBtn=document.getElementById('logoutBtn');
-
-loginBtn.onclick=()=>netlifyIdentity.open('login');
-logoutBtn.onclick=()=>netlifyIdentity.logout();
-
-netlifyIdentity.on('init', user=>{ updateAuth(user); if(user){ loadSlots(); loadOrders(); } });
-netlifyIdentity.on('login', user=>{ updateAuth(user); loadSlots(); loadOrders(); });
-netlifyIdentity.on('logout', ()=>{ updateAuth(null); document.getElementById('slotsWrap').textContent=''; document.getElementById('ordersWrap').textContent=''; });
-
-function updateAuth(user){
-  if(user){ authState.textContent='Logged in as '+(user.email||''); loginBtn.style.display='none'; logoutBtn.style.display='inline-block'; }
-  else{ authState.textContent='Please log in to manage.'; loginBtn.style.display='inline-block'; logoutBtn.style.display='none'; }
+function showErr(msg){
+  const box = $('#errBox');
+  box.textContent = msg || '';
+  box.style.display = msg ? 'block' : 'none';
 }
 
-async function authFetch(url,opts={}){
-  const u = netlifyIdentity.currentUser();
-  const t = u ? await u.jwt() : null;
-  opts.headers = Object.assign({}, opts.headers||{}, t?{Authorization:`Bearer ${t}`}:{});
-  return fetch(url, opts);
+/* -------- Identity -------- */
+netlifyIdentity.init();
+function updateLoginUI(){
+  const user = netlifyIdentity.currentUser();
+  $('#whoami').textContent = user?.email || 'Not logged in';
+}
+async function authHeader(){
+  const user = netlifyIdentity.currentUser();
+  if(!user) return null;
+  try{
+    const jwt = await user.jwt();
+    return { Authorization: `Bearer ${jwt}` };
+  }catch(e){
+    console.warn('jwt error', e);
+    return null;
+  }
 }
 
-/* SLOTS */
+/* -------- API wrappers -------- */
+async function api(path, {method='GET', body=null, auth=false}={}){
+  showErr('');
+  const headers = { 'Content-Type':'application/json' };
+  if(auth){
+    const h = await authHeader();
+    if(!h) throw new Error('Auth required (not logged in)');
+    Object.assign(headers, h);
+  }
+  const r = await fetch(path, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null
+  });
+  let j; try { j = await r.json(); } catch { j = {}; }
+  if(!r.ok){
+    const msg = j?.error || j?.message || `HTTP ${r.status}`;
+    throw new Error(msg);
+  }
+  return j;
+}
+
+/* ================== Slots ================== */
 async function loadSlots(){
-  const c=document.getElementById('slotsWrap'); c.textContent='Loading…';
   try{
-    const r=await fetch(SLOT_API); const d=await r.json(); const slots=Array.isArray(d.slots)?d.slots:[true,true,true,true];
-    c.innerHTML='';
-    slots.forEach((s,i)=>{
-      const el=document.createElement('button');
-      el.className='slot '+(s?'free':'taken');
-      el.textContent=(s?'Free':'Taken')+' — Slot '+(i+1);
-      el.onclick=async()=>{
-        el.disabled=true;
-        await authFetch(SLOT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:i,reserve:!s})});
-        loadSlots();
+    $('#slotsStatus').textContent = 'Loading slots…';
+    const data = await api('/.netlify/functions/slots');
+    const slots = Array.isArray(data.slots) ? data.slots : [true,true,true,true];
+    const row = $('#slotsRow'); row.innerHTML = '';
+    let freeCount = 0;
+
+    slots.forEach((isFree, i)=>{
+      if(isFree) freeCount++;
+      const b = document.createElement('button');
+      b.className = 'slot ' + (isFree ? 'free' : 'taken');
+      b.textContent = (isFree ? 'Free' : 'Taken') + ' — Slot ' + (i+1);
+      b.onclick = async ()=>{
+        try{
+          // if it's free now and you click → reserve=true (mark taken)
+          // if it's taken now and you click → reserve=false (free it)
+          const reserve = isFree ? true : false;
+          await api('/.netlify/functions/slots', { method:'POST', body:{ slot:i, reserve }});
+          await loadSlots();
+        }catch(e){ showErr(e.message); }
       };
-      c.appendChild(el);
+      row.appendChild(b);
     });
-  }catch(_){ c.textContent='Error loading slots.'; }
+
+    $('#slotsSummary').textContent = `${freeCount}/${slots.length} free`;
+    $('#slotsStatus').textContent = 'Click a slot to toggle Free/Taken.';
+  }catch(e){
+    $('#slotsStatus').textContent = 'Error loading slots.';
+    showErr(e.message);
+  }
 }
 
-/* ORDERS */
+/* ================== Orders ================== */
+function orderCard(o){
+  const div = document.createElement('div');
+  div.className = 'card';
+
+  const statusClass = o.status === 'authorized' ? 'pending' : (o.status === 'captured' ? 'captured' : 'voided');
+  const head = document.createElement('div');
+  head.className = 'row';
+  head.innerHTML = `
+    <h4 style="margin:0">Order <code>${o.id}</code></h4>
+    <span class="pill ${statusClass}">${o.status}</span>
+    <span class="right small muted">${time(o.createdAt)}</span>
+  `;
+  div.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'small';
+  body.innerHTML = `
+    <div><strong>Email:</strong> ${o.email || '(none)'} &nbsp; <strong>Payer:</strong> ${o.payerEmail || '(unknown)'}</div>
+    <div><strong>Package:</strong> ${o.package || ''} — ${o.priceLabel || ''} &nbsp; <strong>Extras:</strong> ${o.extras || 0} &nbsp; <strong>Total:</strong> ${fmt(o.totalEUR || 0)}</div>
+    <div><strong>Slot:</strong> ${typeof o.slotIndex==='number' ? (o.slotIndex+1) : '?'}</div>
+    <div style="margin-top:6px; white-space:pre-wrap" class="muted">${o.description || ''}</div>
+  `;
+  div.appendChild(body);
+
+  if(o.status === 'authorized'){
+    const actions = document.createElement('div');
+    actions.className = 'row';
+    const accept = document.createElement('button');
+    accept.className = 'btn ok';
+    accept.textContent = 'Accept (Capture)';
+    accept.onclick = async ()=>{
+      accept.disabled = true;
+      try{
+        await api('/.netlify/functions/pp-capture', { method:'POST', body:{ id:o.id }, auth:true });
+        await refreshAll();
+      }catch(e){ showErr(e.message); accept.disabled = false; }
+    };
+    const decline = document.createElement('button');
+    decline.className = 'btn err';
+    decline.textContent = 'Decline (Void & Free slot)';
+    decline.onclick = async ()=>{
+      decline.disabled = true;
+      try{
+        await api('/.netlify/functions/pp-void', { method:'POST', body:{ id:o.id }, auth:true });
+        await refreshAll();
+      }catch(e){ showErr(e.message); decline.disabled = false; }
+    };
+    actions.appendChild(accept);
+    actions.appendChild(decline);
+    div.appendChild(actions);
+  }
+
+  return div;
+}
+
 async function loadOrders(){
-  const c=document.getElementById('ordersWrap'); c.textContent='Loading…';
   try{
-    const r=await authFetch(ORDERS_API);
-    if(!r.ok){ c.textContent='Auth required or error.'; return; }
-    const {orders=[]}=await r.json();
-    if(!orders.length){ c.textContent='No orders yet.'; return; }
-    c.innerHTML='';
-    orders.forEach(o=>{
-      const row=document.createElement('div');
-      row.style.cssText='display:flex; gap:8px; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:8px; margin:6px 0;';
-      row.innerHTML=`
-        <div style="flex:1">
-          <strong>${o.email}</strong> — ${o.package} (${o.priceLabel})
-          <div class="muted">Total: €${o.totalEUR} • Slot ${Number(o.slotIndex)+1} • Status: <b>${o.status}</b></div>
-          <div class="muted" style="white-space:pre-wrap; margin-top:4px">${o.description||''}</div>
-        </div>
-        <div style="display:flex; gap:6px">
-          <button class="btn" data-act="void" data-id="${o.id}" ${o.status!=='authorized'?'disabled':''}>Decline (void)</button>
-          <button class="btn primary" data-act="capture" data-id="${o.id}" ${o.status!=='authorized'?'disabled':''}>Accept (capture)</button>
-        </div>`;
-      c.appendChild(row);
-    });
-  }catch(_){ c.textContent='Error loading orders.'; }
+    $('#ordersStatus').textContent = 'Loading…';
+    const data = await api('/.netlify/functions/orders', { auth:true });
+    const orders = Array.isArray(data.orders) ? data.orders : [];
+    const pending = orders.filter(o => o.status === 'authorized');
+    const list = $('#ordersList'); list.innerHTML = '';
+    if(!pending.length){
+      $('#ordersStatus').textContent = 'No orders yet.';
+    }else{
+      $('#ordersStatus').textContent = '';
+    }
+    pending.forEach(o => list.appendChild(orderCard(o)));
+    $('#ordersSummary').textContent = `${pending.length} pending`;
+  }catch(e){
+    $('#ordersStatus').textContent = (e.message.includes('Auth required') || /auth/i.test(e.message)) ? 'Auth required. Please Log in.' : 'Error loading orders.';
+    showErr(e.message);
+    $('#ordersSummary').textContent = '—';
+  }
 }
 
-document.addEventListener('click', async (e)=>{
-  const btn=e.target.closest('button[data-act]'); if(!btn) return;
-  btn.disabled=true; const id=btn.dataset.id; const act=btn.dataset.act;
-  try{
-    if(act==='capture'){
-      const r=await authFetch(CAPTURE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-      if(!r.ok) throw new Error('capture failed');
-    }else{
-      const r=await authFetch(VOID_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-      if(!r.ok) throw new Error('void failed');
-    }
-  }catch(err){ alert('Error: '+err.message); }
-  loadOrders(); loadSlots();
+/* ================== Boot & Events ================== */
+async function refreshAll(){
+  updateLoginUI();
+  await loadSlots();
+  await loadOrders();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateLoginUI();
+  loadSlots();
+  loadOrders();
+
+  $('#loginBtn').onclick  = () => netlifyIdentity.open('login');
+  $('#logoutBtn').onclick = () => netlifyIdentity.logout();
+  $('#refreshBtn').onclick = () => refreshAll();
 });
 
-/* Start Identity */
-netlifyIdentity.init();
+netlifyIdentity.on('init',   () => { updateLoginUI(); });
+netlifyIdentity.on('login',  () => { updateLoginUI(); refreshAll(); });
+netlifyIdentity.on('logout', () => { updateLoginUI(); loadOrders(); });
+
 </script>
 </body>
 </html>
