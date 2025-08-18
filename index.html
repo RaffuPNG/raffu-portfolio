@@ -5,78 +5,154 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Raffu — Art Portfolio & Commissions</title>
 
+<!-- Favicon -->
 <link rel="icon" type="image/png" href="https://i.imgur.com/uD9c0sI.png" />
 <link rel="apple-touch-icon" href="https://i.imgur.com/uD9c0sI.png" />
 <link rel="shortcut icon" href="https://i.imgur.com/uD9c0sI.png" />
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-<!-- PayPal SDK: LIVE + AUTHORIZE -->
+<!-- PayPal SDK — LIVE, intent=AUTHORIZE (NO capture here) -->
 <script src="https://www.paypal.com/sdk/js?client-id=AT62TQ2d-mvHP4LOD-ztxUKgYBWtQhAYGCOXKLbw0l11GrFfNSv-Q2IPIBo1Q3huOQr2qNcne0-Qrj14&currency=EUR&intent=authorize"></script>
 
 <style>
-  :root{--bg:#0b0b0f;--panel:#131318;--ink:#eaeaf1;--muted:#9aa0a6;--accent:#ff6a00;--ring:rgba(255,106,0,.28);--radius:18px}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#0b0b0f 0%,#0b0b0f 40%,#0f0f15 100%);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px}
+  :root{
+    --bg:#0b0b0f; --panel:#131318; --ink:#eaeaf1; --muted:#9aa0a6; --accent:#ff6a00; --ring:rgba(255,106,0,.28);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:linear-gradient(180deg,#0b0b0f 0%, #0b0b0f 40%, #0f0f15 100%); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  a{color:inherit; text-decoration:none}
+  img{max-width:100%; display:block}
+  .wrap{max-width:1100px; margin:0 auto; padding:24px}
 
-  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:linear-gradient(to bottom,rgba(11,11,15,.85),rgba(11,11,15,.35));border-bottom:1px solid rgba(255,255,255,.06)}
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
-  .brand{display:flex;align-items:center;gap:10px}.brand h1{font-size:18px;margin:0}.logo{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 0 2px rgba(255,106,0,.55))}
-  .menu{display:flex;gap:14px;flex-wrap:wrap}
-  .menu a{padding:8px 12px;border-radius:12px;color:var(--muted);transition:.25s;border:1px solid transparent}
-  .menu a:hover{color:var(--ink);border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
-  .cta{background:var(--accent);color:#0b0b0f;padding:10px 14px;border-radius:12px;font-weight:800;box-shadow:0 6px 16px -6px var(--accent)}
-  .hamburger{display:none;background:transparent;border:1px solid rgba(255,255,255,.12);color:#fff;padding:8px 10px;border-radius:10px}
+  /* Header / Navbar */
+  header{position:sticky; top:0; z-index:50; backdrop-filter: blur(10px);
+    background:linear-gradient(to bottom, rgba(11,11,15,.85), rgba(11,11,15,.35));
+    border-bottom:1px solid rgba(255,255,255,.06)
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0}
+  .brand{display:flex; align-items:center; gap:10px}
+  .brand h1{font-size:18px; margin:0}
+  .logo{width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 0 2px rgba(255,106,0,.55))}
 
-  .hero{display:grid;grid-template-columns:1.4fr 1fr;gap:26px;padding:26px 0 10px}
-  .card{background:linear-gradient(180deg,#131318,#101016);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:0 10px 40px -24px #000;overflow:hidden}
-  .p16{padding:16px}.p24{padding:24px}.title{font-size:34px;line-height:1.1;margin:6px 0 10px}
-  .accent{color:var(--accent)} .chip{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted)}
-  section{scroll-margin-top:84px;margin-top:24px}
-  .section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:12px}
-  .section-head h2{font-size:22px;margin:0} .panel{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius)}
+  .menu{display:flex; gap:14px; flex-wrap:wrap}
+  .menu a{padding:8px 12px; border-radius:12px; color:var(--muted); transition:all .25s ease; border:1px solid transparent}
+  .menu a:hover{color:var(--ink); border-color:rgba(255,255,255,.08); background:rgba(255,255,255,.03)}
+  .cta{background:var(--accent); color:#0b0b0f; padding:10px 14px; border-radius:12px; font-weight:800; box-shadow:0 6px 16px -6px var(--accent)}
+
+  /* Mobile hamburger */
+  .hamburger{display:none; background:transparent; border:1px solid rgba(255,255,255,.12); color:#fff; padding:8px 10px; border-radius:10px}
+
+  /* Cards & layout */
+  .hero{display:grid; grid-template-columns:1.4fr 1fr; gap:26px; padding:26px 0 10px}
+  .card{background:linear-gradient(180deg,#131318,#101016); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:0 10px 40px -24px #000; overflow:hidden}
+  .p16{padding:16px} .p24{padding:24px}
+  .title{font-size:34px; line-height:1.1; margin:6px 0 10px}
+  .accent{color:var(--accent)}
+  .tagline{color:var(--muted)}
+
+  section{scroll-margin-top:84px; margin-top:24px}
+  .section-head{display:flex; align-items:end; justify-content:space-between; margin-bottom:12px}
+  .section-head h2{font-size:22px; margin:0}
+  .panel{background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius)}
   .muted{color:var(--muted)}
 
-  .comm-head{display:flex;align-items:center;justify-content:space-between;margin:10px 0 8px}
-  .slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .slot{border-radius:12px;padding:12px 10px;text-align:center;font-weight:800;border:1px solid rgba(255,255,255,.08);transition:.15s;cursor:pointer}
-  .slot.free{color:#0b0b0f}.slot.taken{color:#eaeaf1}.slot:hover{transform:translateY(-1px);box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
+  /* Commission slots */
+  .comm-head{display:flex; align-items:center; justify-content:space-between; margin:10px 0 8px}
+  .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+  .slot{
+    border-radius:12px; padding:12px 10px; text-align:center; font-weight:800;
+    border:1px solid rgba(255,255,255,.08);
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+    cursor:pointer;
+  }
+  .slot.free{ color:#0b0b0f; }
+  .slot.taken{ color:#eaeaf1; }
+  .slot:hover{ transform:translateY(-1px); box-shadow:0 10px 30px -18px rgba(0,0,0,.6) }
 
-  .grid{display:grid;gap:14px}.insta-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .img-card{border-radius:18px;overflow:hidden;position:relative;cursor:zoom-in;background:transparent;border:1px solid rgba(255,255,255,.06);transition:.25s}
-  .img-card img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;background:var(--bg);transition:.35s}
-  .img-card:hover{transform:scale(1.035);box-shadow:0 18px 50px -18px rgba(0,0,0,.6),0 0 0 6px var(--ring);border-color:rgba(255,255,255,.12)}
+  /* Gallery */
+  .grid{display:grid; gap:14px}
+  .insta-grid{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
+  .img-card{border-radius:18px; overflow:hidden; position:relative; cursor:zoom-in; background:transparent; border:1px solid rgba(255,255,255,.06); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+  .img-card img{width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; background:var(--bg); transition:transform .35s ease; display:block}
+  .img-card:hover{transform:scale(1.035); box-shadow:0 18px 50px -18px rgba(0,0,0,.6), 0 0 0 6px var(--ring); border-color:rgba(255,255,255,.12)}
   .img-card:hover img{transform:scale(1.03)}
 
-  .prices{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .price-card{padding:18px;border-radius:16px;background:linear-gradient(180deg,#141419,#0f0f14);border:1px solid rgba(255,255,255,.06)}
-  .price{font-size:18px;font-weight:800;color:var(--accent)}
-  .btn{display:inline-block;margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);transition:opacity .2s}
-  .btn.primary{background:var(--accent);color:#0b0b0f;border-color:transparent;font-weight:800}
+  /* Prices */
+  .prices{grid-template-columns:repeat(auto-fit, minmax(260px,1fr))}
+  .price-card{padding:18px; border-radius:16px; background:linear-gradient(180deg,#141419,#0f0f14); border:1px solid rgba(255,255,255,.06)}
+  .price{font-size:18px; font-weight:800; color:var(--accent)}
+  .btn{display:inline-block; margin-top:10px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); transition:opacity .2s ease}
+  .btn.primary{background:var(--accent); color:#0b0b0f; border-color:transparent; font-weight:800}
 
-  footer{color:var(--muted);font-size:13px;text-align:center;padding:22px 0 40px}
-  .reveal{opacity:0;transform:translateY(12px);transition:all .5s ease}.reveal.visible{opacity:1;transform:none}
+  footer{color:var(--muted); font-size:13px; text-align:center; padding:22px 0 40px}
 
-  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:100}
-  .lightbox.open{display:flex}.lb-stage{position:relative;max-width:90vw;max-height:90vh;overflow:hidden;border-radius:16px;background:#0a0a0d;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center}
-  .lb-img{max-width:90vw;max-height:90vh;transform-origin:center center;user-select:none;-webkit-user-drag:none;cursor:grab}
-  .lb-controls{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:8px;background:rgba(20,20,26,.75);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);padding:8px;border-radius:12px}
-  .ctrl{border:none;padding:10px 12px;border-radius:10px;color:#fff;background:#2a2b32;cursor:pointer}.ctrl:hover{background:#343541}
-  .lb-close{position:fixed;top:16px;right:16px;background:#2a2b32;color:#fff;border:none;border-radius:10px;padding:10px 12px;cursor:pointer}
+  /* Reveal on scroll */
+  .reveal{opacity:0; transform:translateY(12px); transition:all .5s ease}
+  .reveal.visible{opacity:1; transform:none}
 
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;z-index:110}.overlay.open{display:block}
-  .popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#141419,#0f0f14);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px;width:min(92vw,520px);display:none;z-index:120;text-align:left;box-shadow:0 18px 50px -18px rgba(0,0,0,.6);animation:fadeIn .2s ease}
-  .popup.open{display:block}@keyframes fadeIn{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
-  .popup h3{margin:0 0 6px}.popup p{margin:0 0 10px;color:var(--muted)}
-  .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field input,.field textarea{background:#0f1016;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px;color:#fff}
-  .pop-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
-  .pop-btn{border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}.pop-ok{background:#2a2b32;color:#fff}.pop-primary{background:var(--accent);color:#0b0b0f}
+  /* Lightbox */
+  .lightbox{position:fixed; inset:0; background:rgba(0,0,0,.8); display:none; align-items:center; justify-content:center; z-index:100}
+  .lightbox.open{display:flex}
+  .lb-stage{position:relative; max-width:90vw; max-height:90vh; overflow:hidden; border-radius:16px; background:#0a0a0d; border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center}
+  .lb-img{max-width:90vw; max-height:90vh; width:auto; height:auto; transform-origin:center center; will-change:transform; cursor:grab; user-select:none; -webkit-user-drag:none}
+  .lb-controls{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:rgba(20,20,26,.75); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); padding:8px; border-radius:12px}
+  .ctrl{border:none; padding:10px 12px; border-radius:10px; color:#fff; background:#2a2b32; cursor:pointer}
+  .ctrl:hover{background:#343541}
+  .lb-close{position:fixed; top:16px; right:16px; background:#2a2b32; color:#fff; border:none; border-radius:10px; padding:10px 12px; cursor:pointer}
 
-  @media (max-width:960px){.wrap{padding:18px}.hero{grid-template-columns:1fr;gap:16px}.title{font-size:clamp(22px,6.2vw,32px)}.section-head h2{font-size:clamp(18px,4.4vw,22px)}}
-  @media (max-width:720px){.hamburger{display:block}header .menu{display:none;position:absolute;left:0;right:0;top:100%;background:rgba(11,11,15,.98);border-bottom:1px solid rgba(255,255,255,.06);padding:10px;gap:8px;flex-direction:column}header.open .menu{display:flex}.menu a{padding:12px;border-radius:10px}.slot-grid{grid-template-columns:repeat(2,1fr)}.btn,.btn.primary{width:100%;text-align:center}.logo{width:30px;height:30px}.lb-controls{bottom:16px}.ctrl{padding:12px 14px}}
-  @media (max-width:420px){.slot-grid{grid-template-columns:1fr}.logo{width:28px;height:28px}}
+  /* Popup (slot/info + order form) */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; z-index:110}
+  .overlay.open{display:block}
+  .popup{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:linear-gradient(180deg,#141419,#0f0f14);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:18px; width:min(92vw,520px);
+    display:none; z-index:120; text-align:left; box-shadow:0 18px 50px -18px rgba(0,0,0,.6);
+    animation:fadeIn .2s ease;
+  }
+  .popup.open{display:block}
+  @keyframes fadeIn{from{opacity:0; transform:translate(-50%,-46%)} to{opacity:1; transform:translate(-50%,-50%)}}
+  .popup h3{margin:0 0 6px}
+  .popup p{margin:0 0 10px; color:var(--muted)}
+  .field{display:flex; flex-direction:column; gap:6px; margin:10px 0}
+  .field input, .field textarea{
+    background:#0f1016; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px; color:#fff;
+  }
+  .pop-actions{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px}
+  .pop-btn{border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700}
+  .pop-ok{background:#2a2b32; color:#fff}
+  .pop-primary{background:var(--accent); color:#0b0b0f}
+
+  /* --------- MOBILE BREAKPOINTS --------- */
+  @media (max-width: 960px){
+    .wrap{padding:18px}
+    .hero{grid-template-columns:1fr; gap:16px}
+    .title{font-size:clamp(22px,6.2vw,32px)}
+    .section-head h2{font-size:clamp(18px,4.4vw,22px)}
+  }
+  @media (max-width: 720px){
+    .hamburger{display:block}
+    header .menu{
+      display:none; position:absolute; left:0; right:0; top:100%;
+      background:rgba(11,11,15,.98); border-bottom:1px solid rgba(255,255,255,.06);
+      padding:10px; gap:8px; flex-direction:column;
+    }
+    header.open .menu{display:flex}
+    .menu a{padding:12px; border-radius:10px}
+    .slot-grid{grid-template-columns:repeat(2,1fr)}
+    .btn, .btn.primary{width:100%; text-align:center}
+    .logo{width:30px; height:30px}
+    .lb-controls{bottom:16px}
+    .ctrl{padding:12px 14px}
+  }
+  @media (max-width: 420px){
+    .slot-grid{grid-template-columns:1fr}
+    .logo{width:28px; height:28px}
+  }
 </style>
 </head>
 <body>
@@ -103,22 +179,23 @@
     <div class="card p24 reveal">
       <div class="chip">Commission me!</div>
       <h2 class="title">Anime/Manga Style <span class="accent">Characters</span>. Poses, Concept Art and Avatars.</h2>
-      <p class="tagline">Hello, welcome to my drawing wall—below you’ll see some of my work.</p>
+      <p class="tagline">Hello, Welcome to my Drawing wall, down below you'll see some of my work.</p>
     </div>
 
     <div class="card p16 reveal">
       <div class="panel p16" style="border-radius:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
           <div>
             <div class="muted" style="font-size:13px">Current time (your device)</div>
-            <div id="currentTime" style="font-size:18px;font-weight:800"></div>
+            <div id="currentTime" style="font-size:18px; font-weight:800"></div>
           </div>
           <div>
             <div class="muted" style="font-size:13px">My timezone</div>
-            <div id="myTz" style="font-size:16px;font-weight:700">Europe</div>
+            <div id="myTz" style="font-size:16px; font-weight:700">Europe</div>
           </div>
         </div>
 
+        <!-- Commission slots -->
         <div style="height:10px"></div>
         <div class="comm-head">
           <strong>Ongoing Commissions</strong>
@@ -131,17 +208,21 @@
 
   <!-- GALLERY -->
   <section id="gallery">
-    <div class="section-head"><h2>Gallery</h2></div>
+    <div class="section-head">
+      <h2>Gallery</h2>
+    </div>
     <div id="instaGrid" class="grid insta-grid"></div>
   </section>
 
   <!-- COMMISSIONS -->
   <section id="commissions">
-    <div class="section-head"><h2>Commissions & Prices</h2></div>
+    <div class="section-head">
+      <h2>Commissions & Prices</h2>
+    </div>
     <div class="panel p24 reveal" style="margin-bottom:12px">
       <p class="muted" style="margin:0">
         • No scene backgrounds — solid color or transparent PNG.<br/>
-        • Extra character: <span class="accent">+15€</span> each (up to 4 extra).
+        • Extra character: <span class="accent">+15€</span>.
       </p>
     </div>
     <div class="grid prices" id="pricesGrid"></div>
@@ -159,12 +240,16 @@
   </section>
 </main>
 
-<footer>© <span id="year"></span> <span id="footerName">Raffu</span>. All rights reserved.</footer>
+<footer>
+  © <span id="year"></span> <span id="footerName">Raffu</span>. All rights reserved.
+</footer>
 
 <!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer">
   <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
-  <div class="lb-stage" id="lbStage"><img id="lbImg" class="lb-img" alt="Artwork" /></div>
+  <div class="lb-stage" id="lbStage">
+    <img id="lbImg" class="lb-img" alt="Artwork" />
+  </div>
   <div class="lb-controls">
     <button class="ctrl" id="zoomOut" aria-label="Zoom out">−</button>
     <button class="ctrl" id="zoomIn" aria-label="Zoom in">+</button>
@@ -172,50 +257,50 @@
   </div>
 </div>
 
-<!-- INFO POPUP -->
+<!-- INFO POPUP (simple) -->
 <div id="slotOverlay" class="overlay" role="presentation"></div>
 <div id="slotPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="slotPopupTitle">
-  <h3 id="slotPopupTitle">Slot status</h3><p id="slotPopupMsg"></p>
-  <div class="pop-actions"><button class="pop-btn pop-ok" id="slotOk">OK</button></div>
+  <h3 id="slotPopupTitle">Slot status</h3>
+  <p id="slotPopupMsg"></p>
+  <div class="pop-actions">
+    <button class="pop-btn pop-ok" id="slotOk">OK</button>
+  </div>
 </div>
 
-<!-- ORDER POPUP -->
+<!-- ORDER POPUP (form + PayPal) -->
 <div id="orderOverlay" class="overlay" role="presentation"></div>
 <div id="orderPopup" class="popup" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
   <h3 id="orderTitle">Order details</h3>
   <p class="muted" id="orderSubtitle">Please include your email, a short brief, and optional references.</p>
-
   <form id="orderForm">
     <div class="field">
       <label>Email</label>
       <input type="email" name="email" id="orderEmail" placeholder="you@example.com" required />
     </div>
-
     <div class="field">
       <label>Description</label>
       <textarea name="description" id="orderDesc" rows="5" placeholder="Tell me about the character, pose, vibe, etc." required></textarea>
     </div>
-
     <div class="field">
       <label>References (PNG/JPG, up to 5)</label>
       <input type="file" name="refs" id="orderFiles" accept="image/png,image/jpeg" multiple />
     </div>
 
+    <!-- Summary + extras -->
     <div class="field">
       <label>Selected package</label>
       <div class="muted" id="orderSummaryLine"></div>
-
       <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
         <strong>Extra characters</strong>
         <button type="button" id="charMinus" class="pop-btn">−</button>
         <span id="charCount">0</span>
         <button type="button" id="charPlus" class="pop-btn">+</button>
-        <span class="muted">(+€15 each, max 4 extras)</span>
+        <span class="muted">(+€15 each, up to 4)</span>
       </div>
       <div style="margin-top:8px"><strong>Total:</strong> <span id="orderTotal">€0</span></div>
     </div>
 
-    <!-- Hidden fields -->
+    <!-- Hidden values posted to Forms + server -->
     <input type="hidden" name="package" id="orderPackage" />
     <input type="hidden" name="variantLabel" id="orderVariantLabel" />
     <input type="hidden" name="baseAmountEUR" id="orderBaseAmount" />
@@ -228,12 +313,12 @@
       <button type="button" class="pop-btn pop-primary" id="orderNext">Proceed to PayPal</button>
     </div>
 
-    <div id="paypalContainer" style="margin-top:12px;display:none"></div>
+    <div id="paypalContainer" style="margin-top:12px; display:none"></div>
     <div id="orderMsg" class="muted" style="margin-top:8px"></div>
   </form>
 </div>
 
-<!-- Hidden Netlify form -->
+<!-- Hidden Netlify form (for files/history) -->
 <form name="commission" data-netlify="true" netlify-honeypot="bot-field" hidden enctype="multipart/form-data">
   <input type="text" name="email" />
   <input type="text" name="description" />
@@ -246,185 +331,407 @@
   <input type="file" name="refs" multiple />
 </form>
 
-<div id="toast" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111218;color:#fff;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);display:none">Copied!</div>
+<div id="toast" style="position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111218; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); display:none">Copied!</div>
 
 <script>
+/* ================== CONFIG ================== */
 const CONFIG = {
-  artistName:"Raffu's Drawing Wall",
-  discordTag:"Raffu_",
-  accent:"#ff6a00",
-  commissions:{maxSlots:4, freeColor:"#19c37d", takenColor:"#0b0b0f"},
-  galleryImages:[
+  artistName: "Raffu's Drawing Wall",
+  discordTag: "Raffu_",
+  accent: "#ff6a00",
+  instagramProfile: "https://www.instagram.com/raffu.draws/",
+  commissions: { maxSlots: 4, freeColor: "#19c37d", takenColor: "#0b0b0f" },
+  galleryImages: [
     "https://i.imgur.com/s1ayfVs.jpg",
     "https://i.imgur.com/yBjgv5I.jpg",
     "https://i.imgur.com/t8BU8qZ.jpg",
     "https://i.imgur.com/OLaaoiz.jpg",
     "https://i.imgur.com/mdXIKzr.jpg"
   ],
-  prices:[
-    { group:"Chest-up / Avatar Type", items:[ {label:"No color / Lineart",price:"15€",amountEUR:15}, {label:"Colored Drawing",price:"20€",amountEUR:20} ] },
-    { group:"3 Quarters / Usual Drawing", items:[ {label:"No color / Lineart",price:"25€",amountEUR:25}, {label:"Colored Drawing",price:"30€",amountEUR:30} ] },
-    { group:"Full Body / Character", items:[ {label:"No color / Lineart",price:"35€",amountEUR:35}, {label:"Colored Drawing",price:"40€",amountEUR:40} ] }
+  prices: [
+    { group: "Chest-up / Avatar Type", items: [
+      { label: "No color / Lineart", price: "15€", amountEUR: 15 },
+      { label: "Colored Drawing",    price: "20€", amountEUR: 20 }
+    ]},
+    { group: "3 Quarters / Usual Drawing", items: [
+      { label: "No color / Lineart", price: "25€", amountEUR: 25 },
+      { label: "Colored Drawing",    price: "30€", amountEUR: 30 }
+    ]},
+    { group: "Full Body / Character", items: [
+      { label: "No color / Lineart", price: "35€", amountEUR: 35 },
+      { label: "Colored Drawing",    price: "40€", amountEUR: 40 }
+    ]}
   ],
-  extraCharEUR:15, maxExtras:4
+  extraCharEUR: 15,
+  maxExtras: 4
 };
+/* ============================================ */
 
+/* Branding & basics */
 document.title = `${CONFIG.artistName} — Art Portfolio & Commissions`;
-artistName.textContent = CONFIG.artistName; footerName.textContent = CONFIG.artistName;
-year.textContent = new Date().getFullYear();
+document.getElementById('artistName').textContent = CONFIG.artistName;
+document.getElementById('footerName').textContent = CONFIG.artistName;
+document.getElementById('year').textContent = new Date().getFullYear();
 document.documentElement.style.setProperty('--accent', CONFIG.accent);
 
-setInterval(()=>{ currentTime.textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) }, 1000);
+/* Clock */
+const currentTimeEl = document.getElementById('currentTime');
+setInterval(()=>{ currentTimeEl.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}); }, 1000);
 
-discTag.textContent = CONFIG.discordTag;
-copyDiscord.onclick = async()=>{ try{ await navigator.clipboard.writeText(CONFIG.discordTag); toast("Copied!") }catch{ toast(CONFIG.discordTag) } };
+/* Contact */
+document.getElementById('discTag').textContent = CONFIG.discordTag;
+document.getElementById('copyDiscord').onclick = async ()=>{ try{ await navigator.clipboard.writeText(CONFIG.discordTag); toast("Copied!"); } catch{ toast(CONFIG.discordTag); } };
 
-const SLOT_API='/.netlify/functions/slots';
-function normalizeFree(v){ if(v===true)return true; if(v===false)return false; if(typeof v==='number')return v===1; if(typeof v==='string'){const s=v.trim().toLowerCase(); return s==='true'||s==='1'||s==='free'} return false}
-async function getSlots(){ const r=await fetch(SLOT_API,{method:'GET',cache:'no-store'}); const d=await r.json(); return Array.isArray(d.slots)?d.slots:[true,true,true,true]}
-async function setSlot(i,reserve){ await fetch(SLOT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:i,reserve})}) }
-async function buildSlots(){
-  const grid=slotGrid, sum=slotSummary; grid.innerHTML='';
-  let slots; try{ slots=await getSlots() }catch{ slots=[true,true,true,true] }
-  const freeColor=CONFIG.commissions.freeColor, takenColor=CONFIG.commissions.takenColor;
-  let freeCount=0;
-  slots.forEach((val,i)=>{ const isFree=normalizeFree(val); if(isFree)freeCount++;
-    const div=document.createElement('div'); div.className='slot '+(isFree?'free':'taken'); div.textContent=`Slot ${i+1}`;
-    div.style.background=isFree?freeColor:takenColor; div.style.borderColor=isFree?'transparent':'rgba(255,255,255,.12)';
-    div.addEventListener('click',()=>openPopup(isFree?'✅ This slot is free to take!':'❌ This slot is currently unavailable')); grid.appendChild(div);
+/* =================== SLOTS (Netlify) =================== */
+const SLOT_API = '/.netlify/functions/slots';
+function normalizeFree(v){
+  if (v === true) return true;
+  if (v === false) return false;
+  if (typeof v === 'number') return v === 1;
+  if (typeof v === 'string'){ const s=v.trim().toLowerCase(); return (s==='true'||s==='1'||s==='free'); }
+  return false;
+}
+async function getSlots() {
+  const r = await fetch(SLOT_API, { method: 'GET', cache: 'no-store' });
+  const data = await r.json();
+  return Array.isArray(data.slots) ? data.slots : [true, true, true, true];
+}
+async function setSlot(slotIndex, reserve) {
+  await fetch(SLOT_API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ slot: slotIndex, reserve }) });
+}
+async function buildSlots() {
+  const grid = document.getElementById('slotGrid');
+  const sum = document.getElementById('slotSummary');
+  grid.innerHTML = '';
+
+  let slots;
+  try { slots = await getSlots(); } catch(e){ slots = [true,true,true,true]; }
+
+  const freeColor  = CONFIG.commissions.freeColor;
+  const takenColor = CONFIG.commissions.takenColor;
+
+  let freeCount = 0;
+  slots.forEach((val, i) => {
+    const isFree = normalizeFree(val);
+    if (isFree) freeCount++;
+
+    const div = document.createElement('div');
+    div.className = 'slot ' + (isFree ? 'free' : 'taken');
+    div.textContent = `Slot ${i + 1}`;
+    div.style.background = isFree ? freeColor : takenColor;
+    div.style.borderColor = isFree ? 'transparent' : 'rgba(255,255,255,.12)';
+    div.addEventListener('click', () => openPopup(isFree ? '✅ This slot is free to take!' : '❌ This slot is currently unavailable'));
+    grid.appendChild(div);
   });
-  sum.textContent=`${freeCount}/${slots.length} free`;
-  const anyFree=freeCount>0;
-  document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn=>{
-    if(!btn.dataset.baseText) btn.dataset.baseText=btn.textContent;
-    btn.disabled=!anyFree; btn.style.opacity=anyFree?'1':'.55'; btn.style.pointerEvents=anyFree?'auto':'none';
-    btn.textContent=anyFree?btn.dataset.baseText:'No slots available'; btn.setAttribute('aria-disabled',String(!anyFree));
+
+  sum.textContent = `${freeCount}/${slots.length} free`;
+
+  const anyFree = freeCount > 0;
+  document.querySelectorAll('#pricesGrid .btn.primary').forEach(btn => {
+    if (!btn.dataset.baseText) btn.dataset.baseText = btn.textContent;
+    btn.disabled = !anyFree;
+    btn.style.opacity = anyFree ? '1' : '.55';
+    btn.style.pointerEvents = anyFree ? 'auto' : 'none';
+    btn.textContent = anyFree ? btn.dataset.baseText : 'No slots available';
+    btn.setAttribute('aria-disabled', String(!anyFree));
   });
 }
 
-const pricesGrid=document.getElementById('pricesGrid');
-CONFIG.prices.forEach((group,gi)=>{
-  const card=document.createElement('div'); card.className='price-card reveal';
-  const radios=group.items.map((it,idx)=>`
+/* =================== PRICES + ORDER FLOW =================== */
+const pricesGrid = document.getElementById('pricesGrid');
+CONFIG.prices.forEach((group, gi)=>{
+  const card = document.createElement('div');
+  card.className = 'price-card reveal';
+  const radios = group.items.map((it, idx)=>`
     <label style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.06);align-items:center">
       <span class="muted"><input type="radio" name="choice-${gi}" value="${idx}" ${idx===0?'checked':''} style="margin-right:8px">${it.label}</span>
       <strong class="price">${it.price}</strong>
     </label>
   `).join('');
-  card.innerHTML=`<h3 style="margin:0 0 8px">${group.group}</h3><div>${radios}</div><button class="btn primary order-btn" data-group-index="${gi}">Order ${group.group.split('/')[0].trim()}</button>`;
+  card.innerHTML = `
+    <h3 style="margin:0 0 8px">${group.group}</h3>
+    <div>${radios}</div>
+    <button class="btn primary order-btn" data-group-index="${gi}">Order ${group.group.split('/')[0].trim()}</button>
+  `;
   pricesGrid.appendChild(card);
 });
 
-const orderOverlay=document.getElementById('orderOverlay'), orderPopup=document.getElementById('orderPopup');
-const orderCancelBtn=orderCancel, orderNextBtn=orderNext, paypalWrap=paypalContainer, orderMsg=orderMsg;
-const orderEmail=document.getElementById('orderEmail'), orderDesc=document.getElementById('orderDesc'), orderFiles=document.getElementById('orderFiles');
-const orderPkg=orderPackage, orderVariantLabel=orderVariantLabel, orderBaseAmount=orderBaseAmount, orderExtras=orderExtras, orderTotalEUR=orderTotalEUR, orderSlotIndex=orderSlotIndex;
-const orderSummaryLine=orderSummaryLine, charMinus=charMinus, charPlus=charPlus, charCount=charCount, totalLabel=orderTotal;
+/* Elements used by modal */
+const orderOverlay   = document.getElementById('orderOverlay');
+const orderPopup     = document.getElementById('orderPopup');
+const orderMsg       = document.getElementById('orderMsg');
+const orderEmail     = document.getElementById('orderEmail');
+const orderDesc      = document.getElementById('orderDesc');
+const orderFiles     = document.getElementById('orderFiles');
+const orderPkg       = document.getElementById('orderPackage');
+const orderVariantLabel = document.getElementById('orderVariantLabel');
+const orderBaseAmount = document.getElementById('orderBaseAmount');
+const orderExtras     = document.getElementById('orderExtras');
+const orderTotalEUR   = document.getElementById('orderTotalEUR');
+const orderSlotIndex  = document.getElementById('orderSlotIndex');
+const orderNextBtn    = document.getElementById('orderNext');
+const orderCancelBtn  = document.getElementById('orderCancel');
+const paypalWrap      = document.getElementById('paypalContainer');
+const orderSummaryLine= document.getElementById('orderSummaryLine');
+const charMinus = document.getElementById('charMinus');
+const charPlus  = document.getElementById('charPlus');
+const charCount = document.getElementById('charCount');
+const totalLabel= document.getElementById('orderTotal');
 
-let pendingOrder=null; function fmtEUR(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'EUR'}).format(n) }
-function openOrderModal({groupName,variantLabel,baseAmountEUR}){ pendingOrder={groupName,variantLabel,baseAmountEUR,extras:0,totalEUR:baseAmountEUR};
-  orderPkg.value=groupName; orderVariantLabel.value=variantLabel; orderBaseAmount.value=String(baseAmountEUR); orderExtras.value='0'; orderTotalEUR.value=String(baseAmountEUR);
-  orderSummaryLine.textContent=`${groupName} — ${variantLabel} (${fmtEUR(baseAmountEUR)})`;
-  charCount.textContent='0'; totalLabel.textContent=fmtEUR(baseAmountEUR);
-  orderMsg.textContent=""; paypalWrap.style.display='none'; paypalWrap.innerHTML=''; orderNextBtn.style.display='inline-block';
-  orderOverlay.classList.add('open'); orderPopup.classList.add('open');
-}
-function closeOrderModal(){ orderOverlay.classList.remove('open'); orderPopup.classList.remove('open'); pendingOrder=null; paypalWrap.innerHTML='' }
-function recalcTotal(){ const extras=pendingOrder.extras; const total=pendingOrder.baseAmountEUR+(extras*CONFIG.extraCharEUR);
-  pendingOrder.totalEUR=total; orderExtras.value=String(extras); orderTotalEUR.value=String(total); totalLabel.textContent=fmtEUR(total);
-}
-charMinus.onclick=()=>{ if(!pendingOrder)return; if(pendingOrder.extras>0){ pendingOrder.extras--; charCount.textContent=String(pendingOrder.extras); recalcTotal() } }
-charPlus.onclick =()=>{ if(!pendingOrder)return; if(pendingOrder.extras<CONFIG.maxExtras){ pendingOrder.extras++; charCount.textContent=String(pendingOrder.extras); recalcTotal() } }
+let pendingOrder = null;
+const fmtEUR = (n)=> new Intl.NumberFormat('en-US',{style:'currency',currency:'EUR'}).format(n);
 
-document.addEventListener('click',(e)=>{
-  const btn=e.target.closest('.order-btn'); if(!btn) return;
-  const gi=parseInt(btn.dataset.groupIndex,10); const group=CONFIG.prices[gi];
-  const card=btn.closest('.price-card'); const checked=card.querySelector(`input[name="choice-${gi}"]:checked`);
-  const vi=checked?parseInt(checked.value,10):0; const item=group.items[vi];
-  openOrderModal({groupName:group.group,variantLabel:item.label,baseAmountEUR:item.amountEUR});
+function openOrderModal({group, variantLabel, baseAmountEUR}){
+  pendingOrder = { group, variantLabel, baseAmountEUR, extras:0, totalEUR: baseAmountEUR };
+
+  orderPkg.value = group;
+  orderVariantLabel.value = variantLabel;
+  orderBaseAmount.value = String(baseAmountEUR);
+  orderExtras.value = '0';
+  orderTotalEUR.value = String(baseAmountEUR);
+
+  orderSummaryLine.textContent = `${group} — ${variantLabel} (${fmtEUR(baseAmountEUR)})`;
+  charCount.textContent = '0';
+  totalLabel.textContent = fmtEUR(baseAmountEUR);
+
+  orderMsg.textContent = "";
+  paypalWrap.style.display = 'none';
+  paypalWrap.innerHTML = '';
+  orderNextBtn.style.display = 'inline-block';
+
+  orderOverlay.classList.add('open');
+  orderPopup.classList.add('open');
+}
+function closeOrderModal(){
+  orderOverlay.classList.remove('open');
+  orderPopup.classList.remove('open');
+  pendingOrder = null;
+  paypalWrap.innerHTML = '';
+}
+function recalcTotal(){
+  const t = pendingOrder.baseAmountEUR + pendingOrder.extras * CONFIG.extraCharEUR;
+  pendingOrder.totalEUR = t;
+  orderExtras.value = String(pendingOrder.extras);
+  orderTotalEUR.value = String(t);
+  totalLabel.textContent = fmtEUR(t);
+}
+charMinus.onclick = ()=>{ if(!pendingOrder) return; if(pendingOrder.extras>0){ pendingOrder.extras--; charCount.textContent=String(pendingOrder.extras); recalcTotal(); } }
+charPlus.onclick  = ()=>{ if(!pendingOrder) return; if(pendingOrder.extras<CONFIG.maxExtras){ pendingOrder.extras++; charCount.textContent=String(pendingOrder.extras); recalcTotal(); } }
+
+/* Click "Order" buttons (reads which radio is selected) */
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.order-btn');
+  if(!btn) return;
+
+  const gi = parseInt(btn.dataset.groupIndex,10);
+  const group = CONFIG.prices[gi];
+  const card = btn.closest('.price-card');
+  const checked = card.querySelector(`input[name="choice-${gi}"]:checked`);
+  const vi = checked ? parseInt(checked.value,10) : 0;
+  const item = group.items[vi];
+
+  openOrderModal({ group: group.group, variantLabel: item.label, baseAmountEUR: item.amountEUR });
 });
 
-orderNextBtn.onclick=async()=>{
-  if(!orderEmail.value||!orderDesc.value){ orderMsg.textContent="Please fill your email and description first."; return }
-  const slots=await getSlots(); const firstFree=slots.findIndex(s=>normalizeFree(s));
-  if(firstFree===-1){ orderMsg.textContent="No slots available right now."; return }
-  orderSlotIndex.value=String(firstFree);
+/* Proceed to PayPal: validate form first, then render PayPal buttons (AUTHORIZE) */
+orderNextBtn.addEventListener('click', async ()=>{
+  if(!orderEmail.value || !orderDesc.value){
+    orderMsg.textContent = "Please fill your email and description first.";
+    return;
+  }
+  const slots = await getSlots();
+  const firstFree = slots.findIndex(s=>normalizeFree(s));
+  if(firstFree === -1){
+    orderMsg.textContent = "No slots available right now.";
+    return;
+  }
+  orderSlotIndex.value = String(firstFree);
 
-  orderNextBtn.style.display='none'; paypalWrap.style.display='block';
-  orderMsg.textContent="Authorize the payment to reserve your slot (you won’t be charged until I accept).";
+  orderNextBtn.style.display = 'none';
+  paypalWrap.style.display = 'block';
+  orderMsg.textContent = "Authorize the payment to reserve your slot (you won't be charged until I accept).";
 
   paypal.Buttons({
-    style:{shape:'pill',layout:'vertical'},
-    createOrder:(data,actions)=>actions.order.create({
-      intent:'AUTHORIZE',
-      purchase_units:[{ amount:{ value:String(pendingOrder.totalEUR), currency_code:'EUR' },
-        description:`${orderPkg.value} — ${orderVariantLabel.value} (+${orderExtras.value} extras)` }]
-    }),
-    onApprove: async (data,actions)=>{
-      const authorization=await actions.order.authorize();
-      const payerEmail=authorization?.payer?.email_address||''; let authId='';
-      try{ authId=authorization?.purchase_units?.[0]?.payments?.authorizations?.[0]?.id||'' }catch{}
-      const idx=parseInt(orderSlotIndex.value,10); try{ await setSlot(idx,true) }catch{}
-      try{
-        await fetch('/.netlify/functions/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-          status:'authorized',slotIndex:idx,email:orderEmail.value,description:orderDesc.value,
-          package:orderPkg.value,priceLabel:orderVariantLabel.value,extras:parseInt(orderExtras.value,10)||0,
-          totalEUR:parseFloat(orderTotalEUR.value),paypalOrderId:data.orderID,paypalAuthId:authId,payerEmail
-        })});
-      }catch{}
-      await submitNetlifyForm({ id:data.orderID, payer:{ email_address:payerEmail } });
-      closeOrderModal(); openPopup('✅ Authorization received! Your slot is reserved. I will review and accept or decline shortly.'); buildSlots();
+    style: { shape:'pill', layout:'vertical' },
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        intent: 'AUTHORIZE',
+        purchase_units: [{
+          amount: { value: String(pendingOrder.totalEUR), currency_code: 'EUR' },
+          description: `${orderPkg.value} — ${orderVariantLabel.value} (+${orderExtras.value} extras)`
+        }]
+      });
     },
-    onError:()=>{ orderMsg.textContent="PayPal error. Please try again." },
-    onCancel:()=>{ orderMsg.textContent="Authorization cancelled." }
-  }).render('#paypalContainer');
-};
+    onApprove: async (data, actions) => {
+      const authorization = await actions.order.authorize(); // no capture here
+      let authId = '';
+      try { authId = authorization?.purchase_units?.[0]?.payments?.authorizations?.[0]?.id || ''; } catch {}
+      const payerEmail = authorization?.payer?.email_address || '';
 
-async function submitNetlifyForm(pp){ const fd=new FormData();
-  fd.append('form-name','commission'); fd.append('email',orderEmail.value); fd.append('description',orderDesc.value);
-  fd.append('package',orderPkg.value); fd.append('variantLabel',orderVariantLabel.value); fd.append('baseAmountEUR',orderBaseAmount.value);
-  fd.append('extrasCount',orderExtras.value); fd.append('totalEUR',orderTotalEUR.value); fd.append('slotIndex',orderSlotIndex.value);
-  fd.append('paypal_order_id',pp?.id||''); fd.append('paypal_payer_email',pp?.payer?.email_address||'');
-  Array.from(orderFiles.files||[]).slice(0,5).forEach(f=>fd.append('refs',f,f.name));
-  await fetch('/',{method:'POST',body:fd});
+      const idx = parseInt(orderSlotIndex.value, 10);
+      try{ await setSlot(idx, true); }catch{}
+
+      // Save a structured order for your admin dashboard
+      try{
+        await fetch('/.netlify/functions/orders', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            status: 'authorized',
+            slotIndex: idx,
+            email: orderEmail.value,
+            description: orderDesc.value,
+            package: orderPkg.value,
+            priceLabel: orderVariantLabel.value,
+            extras: parseInt(orderExtras.value,10) || 0,
+            totalEUR: parseFloat(orderTotalEUR.value),
+            paypalOrderId: data.orderID,
+            paypalAuthId: authId,
+            payerEmail
+          })
+        });
+      }catch(e){ /* ignore */ }
+
+      // Submit to Netlify Forms (for attachments/history)
+      await submitNetlifyForm({ id: data.orderID, payer: { email_address: payerEmail } });
+
+      closeOrderModal();
+      openPopup('✅ Authorization received! Your slot is reserved. I will review and accept or decline shortly.');
+      buildSlots();
+    },
+    onError: () => { orderMsg.textContent = "PayPal error. Please try again."; },
+    onCancel: () => { orderMsg.textContent = "Authorization cancelled."; }
+  }).render('#paypalContainer');
+});
+
+/* Submit to Netlify Forms (stores refs + a copy of data) */
+async function submitNetlifyForm(paypalDetails){
+  const fd = new FormData();
+  fd.append('form-name', 'commission');
+  fd.append('email', orderEmail.value);
+  fd.append('description', orderDesc.value);
+  fd.append('package', orderPkg.value);
+  fd.append('variantLabel', orderVariantLabel.value);
+  fd.append('baseAmountEUR', orderBaseAmount.value);
+  fd.append('extrasCount', orderExtras.value);
+  fd.append('totalEUR', orderTotalEUR.value);
+  fd.append('slotIndex', orderSlotIndex.value);
+  fd.append('paypal_order_id', paypalDetails.id || '');
+  fd.append('paypal_payer_email', paypalDetails?.payer?.email_address || '');
+  // files
+  Array.from(orderFiles.files || []).slice(0,5).forEach(f => fd.append('refs', f, f.name));
+
+  await fetch('/', { method:'POST', body:fd });
 }
 
-orderCancelBtn.onclick=closeOrderModal;
+/* Cancel order */
+orderCancelBtn.addEventListener('click', closeOrderModal);
 
-/* Gallery + reveal + lightbox */
-const grid=document.getElementById('instaGrid');
-CONFIG.galleryImages.forEach(src=>{ const card=document.createElement('div'); card.className='img-card reveal';
-  card.innerHTML=`<img alt="Artwork" src="${src}" loading="lazy" decoding="async">`; card.addEventListener('click',()=>openLightbox(src)); grid.appendChild(card) });
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})},{threshold:.15});
+/* =================== GALLERY + LIGHTBOX =================== */
+const grid = document.getElementById('instaGrid');
+CONFIG.galleryImages.forEach(src=>{
+  const card = document.createElement('div');
+  card.className = 'img-card reveal';
+  card.innerHTML = `<img alt="Artwork" src="${src}" loading="lazy" decoding="async">`;
+  card.addEventListener('click', ()=> openLightbox(src));
+  grid.appendChild(card);
+});
+
+/* Reveal on scroll */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} });
+},{ threshold:.15 });
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1100) }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=> t.style.display='none', 1100);
+}
 
-const lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg'), lbStage=document.getElementById('lbStage');
-const btnIn=zoomIn, btnOut=zoomOut, btnReset=zoomReset, btnClose=lbClose;
-let scale=1,tx=0,ty=0,drag=false,sx=0,sy=0; const MIN=1,MAX=2.5;
-function openLightbox(src){ lbImg.onload=()=>{ resetZoom() }; lbImg.src=src; lb.classList.add('open'); document.body.style.overflow='hidden' }
-function closeLightbox(){ lb.classList.remove('open'); document.body.style.overflow='' }
-function applyTransform(){ lbImg.style.transform=`translate(${tx}px,${ty}px) scale(${scale})` }
-function resetZoom(){ scale=1; tx=0; ty=0; applyTransform() }
-btnClose.onclick=closeLightbox; lb.addEventListener('click',e=>{ if(e.target===lb) closeLightbox() });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox() });
-btnIn.onclick=()=>setScale(scale+.25); btnOut.onclick=()=>setScale(scale-.25); btnReset.onclick=resetZoom;
-function setScale(ns,fx=null,fy=null){ ns=Math.min(MAX,Math.max(MIN,ns)); if(ns!==scale){ if(fx!==null&&fy!==null){ const r=lbStage.getBoundingClientRect(); const cx=fx-r.left-r.width/2; const cy=fy-r.top-r.height/2; tx-=cx*(ns/scale-1); ty-=cy*(ns/scale-1) } scale=ns; applyTransform() } }
-lbStage.addEventListener('wheel',e=>{ e.preventDefault(); const d=Math.sign(e.deltaY)*-.2; setScale(scale+d,e.clientX,e.clientY) },{passive:false});
-lbStage.addEventListener('mousedown',e=>{ drag=true; lbImg.style.cursor='grabbing'; sx=e.clientX; sy=e.clientY });
-window.addEventListener('mouseup',()=>{ drag=false; lbImg.style.cursor='grab' });
-window.addEventListener('mousemove',e=>{ if(!drag)return; tx+=(e.clientX-sx); ty+=(e.clientY-sy); sx=e.clientX; sy=e.clientY; applyTransform() });
-lbStage.addEventListener('dblclick',e=>{ if(scale===1) setScale(1.75,e.clientX,e.clientY); else resetZoom() });
+/* Lightbox with fit + zoom */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbStage = document.getElementById('lbStage');
+const btnIn = document.getElementById('zoomIn');
+const btnOut = document.getElementById('zoomOut');
+const btnReset = document.getElementById('zoomReset');
+const btnClose = document.getElementById('lbClose');
 
-const slotOverlay=document.getElementById('slotOverlay'), slotPopup=document.getElementById('slotPopup'), slotMsg=document.getElementById('slotPopupMsg'), slotOk=document.getElementById('slotOk');
-function openPopup(m){ slotMsg.textContent=m; slotOverlay.classList.add('open'); slotPopup.classList.add('open') }
-function closePopup(){ slotOverlay.classList.remove('open'); slotPopup.classList.remove('open') }
-slotOverlay.addEventListener('click',closePopup); slotOk.addEventListener('click',closePopup);
+let scale = 1, tx = 0, ty = 0, dragging = false, sx = 0, sy = 0;
+const MIN_SCALE = 1, MAX_SCALE = 2.5;
 
-const headerEl=document.getElementById('siteHeader'), ham=document.getElementById('hamburger');
-ham.addEventListener('click',()=>{ headerEl.classList.toggle('open'); ham.setAttribute('aria-expanded',headerEl.classList.contains('open')) });
+function openLightbox(src){
+  lbImg.onload = ()=>{ resetZoom(); };
+  lbImg.src = src;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){ lb.classList.remove('open'); document.body.style.overflow=''; }
+function applyTransform(){ lbImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
+function resetZoom(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
+btnClose.onclick = closeLightbox;
+lb.addEventListener('click', (e)=>{ if(e.target === lb) closeLightbox(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
+btnIn.onclick = ()=> setScale(scale + 0.25);
+btnOut.onclick = ()=> setScale(scale - 0.25);
+btnReset.onclick = resetZoom;
 
+function setScale(newScale, focusX=null, focusY=null){
+  newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+  if(newScale !== scale){
+    if (focusX !== null && focusY !== null){
+      const rect = lbStage.getBoundingClientRect();
+      const cx = focusX - rect.left - rect.width/2;
+      const cy = focusY - rect.top - rect.height/2;
+      tx -= cx * (newScale/scale - 1);
+      ty -= cy * (newScale/scale - 1);
+    }
+    scale = newScale; applyTransform();
+  }
+}
+lbStage.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const delta = Math.sign(e.deltaY) * -0.2;
+  setScale(scale + delta, e.clientX, e.clientY);
+},{passive:false});
+lbStage.addEventListener('mousedown', (e)=>{ dragging = true; lbImg.style.cursor='grabbing'; sx=e.clientX; sy=e.clientY; });
+window.addEventListener('mouseup', ()=>{ dragging=false; lbImg.style.cursor='grab'; });
+window.addEventListener('mousemove', (e)=>{
+  if(!dragging) return;
+  tx += (e.clientX - sx); ty += (e.clientY - sy);
+  sx = e.clientX; sy = e.clientY; applyTransform();
+});
+lbStage.addEventListener('dblclick', (e)=>{
+  if(scale === 1) setScale(1.75, e.clientX, e.clientY); else resetZoom();
+});
+
+/* Simple info popup */
+const slotOverlay = document.getElementById('slotOverlay');
+const slotPopup = document.getElementById('slotPopup');
+const slotMsg = document.getElementById('slotPopupMsg');
+const slotOk = document.getElementById('slotOk');
+function openPopup(message){
+  slotMsg.textContent = message;
+  slotOverlay.classList.add('open');
+  slotPopup.classList.add('open');
+}
+function closePopup(){
+  slotOverlay.classList.remove('open');
+  slotPopup.classList.remove('open');
+}
+slotOverlay.addEventListener('click', closePopup);
+slotOk.addEventListener('click', closePopup);
+
+/* Mobile nav toggle */
+const headerEl = document.getElementById('siteHeader');
+const ham = document.getElementById('hamburger');
+ham.addEventListener('click', ()=>{
+  headerEl.classList.toggle('open');
+  ham.setAttribute('aria-expanded', headerEl.classList.contains('open'));
+});
+
+/* Kick things off */
 buildSlots();
 </script>
 </body>
